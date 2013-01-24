@@ -6,6 +6,7 @@
 # Written by Adafruit Industries.  MIT license.
 # 
 # Required software includes Adafruit_Thermal and PySerial libraries.
+# Other libraries used are part of stock Python install.
 # 
 # Resources:
 # http://www.adafruit.com/products/597 Mini Thermal Receipt Printer
@@ -21,7 +22,7 @@ from xml.dom.minidom import parseString
 # by 'manually' visiting http://weather.yahoo.com, entering a location
 # and requesting a forecast, then copy the number from the end of the
 # current URL string and paste it here.
-WOEID = '12797347'
+WOEID = '2459115'
 
 # Dumps one forecast line to the printer
 def forecast(idx):

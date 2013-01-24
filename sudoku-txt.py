@@ -2,6 +2,8 @@
 #
 # Sudoku Generator and Solver in 250 lines of python
 # Copyright (c) 2006 David Bau.  All rights reserved.
+# Adapted for Adafruit_Thermal library by Phil Burgess
+# for Adafruit Industries.
 #
 # Can be used as either a command-line tool or as a cgi script.
 #
@@ -36,7 +38,6 @@ def main():
     printer.print(printboard(puzzle))
     printer.feed(1)
     printer.println("RATING:", ratepuzzle(puzzle, 4))
-    printer.feed(3)
     if len(args) > 0:
       printer.println()
       printer.println("SOLUTION:")
@@ -191,24 +192,24 @@ def boardmatches(b1, b2):
 def printboard(board):
   # Top edge of board:
   out = ('      '
-       + chr(0xC9)  # Top left corner
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
-       + chr(0xCB)  # Top 'T' (double)
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
-       + chr(0xCB)  # Top 'T' (double)
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
-       + chr(0xD1)  # Top 'T'
-       + chr(0xCD)  # Top edge
+       + chr(0xC9) # Top left corner
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
+       + chr(0xCB) # Top 'T' (double)
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
+       + chr(0xCB) # Top 'T' (double)
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
+       + chr(0xD1) # Top 'T'
+       + chr(0xCD) # Top edge
        + chr(0xBB) # Top right corner
        + '\n')
   for row in xrange(9):
@@ -227,70 +228,71 @@ def printboard(board):
     if(row < 8):
       if(row == 2) or (row == 5):
         out += ('      '
-              + chr(0xCC)  # Left 'T' (double)
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xCE) # Double +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xCE) # Double +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xD8) # +
-              + chr (0xCD) # Horizontal bar
-              + chr (0xB9) # Right 'T' (double)
+              + chr(0xCC) # Left 'T' (double)
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xCE) # Double +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xCE) # Double +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xD8) # +
+              + chr(0xCD) # Horizontal bar
+              + chr(0xB9) # Right 'T' (double)
               + '\n')
       else:
         out += ('      '
-              + chr(0xC7)  # Left 'T'
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xD7) # Double +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xD7) # Double +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xC5) # +
-              + chr (0xC4) # Horizontal bar
-              + chr (0xB6) # Right 'T'
+              + chr(0xC7) # Left 'T'
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xD7) # Double +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xD7) # Double +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xC5) # +
+              + chr(0xC4) # Horizontal bar
+              + chr(0xB6) # Right 'T'
               + '\n')
   out += ('      '
-        + chr(0xC8)  # Bottom left corner
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCA)  # Bottom 'T' (double)
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCA)  # Bottom 'T' (double)
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xCF)  # Bottom 'T'
-        + chr(0xCD)  # Bottom edge
-        + chr(0xBC)  # Bottom-right corner
+        + chr(0xC8) # Bottom left corner
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xCA) # Bottom 'T' (double)
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xCA) # Bottom 'T' (double)
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xCF) # Bottom 'T'
+        + chr(0xCD) # Bottom edge
+        + chr(0xBC) # Bottom-right corner
         + '\n')
 
+# Original output code:
 #  out = ""
 #  for row in xrange(9):
 #    for col in xrange(9):
