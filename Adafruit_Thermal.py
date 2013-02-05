@@ -499,7 +499,7 @@ class Adafruit_Thermal(Serial):
 	def hasPaper(self):
 		self.writeBytes(27, 118, 0)
 		# Bit 2 of response seems to be paper status
-		stat = ord(printer.read(1)) & 0b00000100
+		stat = ord(self.read(1)) & 0b00000100
 		# If set, we have paper; if clear, no paper
 		return stat == 0
 
