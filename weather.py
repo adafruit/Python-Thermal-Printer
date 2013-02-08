@@ -39,7 +39,7 @@ def forecast(idx):
 
 printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 deg     = chr(0xf8)  # Degree symbol on thermal printer
-printer.begin(150)   # Scale back the heat time a little
+printer.begin(50)    # Scale back the heat time a little
 
 # Fetch forecast data, parse resulting XML
 dom = parseString(urllib.urlopen(

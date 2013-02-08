@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 #
 # Sudoku Generator and Solver in 250 lines of python
 # Copyright (c) 2006 David Bau.  All rights reserved.
@@ -31,7 +31,7 @@ xcoord  = [ 15, 55, 95,  139, 179, 219,  263, 303, 343 ]
 ycoord  = [ 14, 54, 94,  138, 178, 218,  262, 302, 342 ]
 
 def main():
-  printer.begin(150) # Scale back the heat time a little
+  printer.begin(60) # Scale back the heat time a little
 
   # Due to what looks like a paste bug in Python imaging, this
   # currently uses JPEG format for the bitmaps rather than the

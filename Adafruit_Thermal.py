@@ -25,6 +25,12 @@ from __future__ import print_function
 from serial import Serial
 import time
 
+# TODO: maybe use standard ConfigParser library to put printer heat settings
+# in a global config file (rather than the library).  But for now...
+# Also TODO: use standard Python library install procedure.
+# Also also: still need docstrings throughout!
+# And: trap errors properly.  Some stuff just falls through right now.
+
 class Adafruit_Thermal(Serial):
 
 	resumeTime    =  0.0
@@ -84,12 +90,12 @@ class Adafruit_Thermal(Serial):
 		# blank page may occur.  The more heating interval, the more
 		# clear, but the slower printing speed.
 
-		heatTime = kwargs.get('heattime', 200)
+		heatTime = kwargs.get('heattime', 45)
 		self.writeBytes(
 		  27,       # Esc
 		  55,       # 7 (print settings)
 		  20,       # Heat dots (20 = balance darkness w/no jams)
-		  heatTime, # Lib default = 255 (max)
+		  heatTime, # Lib default = 45
 		  250)      # Heat interval (500 uS = slower but darker)
 
 		# Description of print density from page 23 of the manual:
@@ -195,12 +201,12 @@ class Adafruit_Thermal(Serial):
 	# The bulk of this method was moved into __init__,
 	# but this is left here for compatibility with older
 	# code that might get ported directly from Arduino.
-	def begin(self, heatTime=200):
+	def begin(self, heatTime=45):
 		self.writeBytes(
 		  27,       # Esc
 		  55,       # 7 (print settings)
 		  20,       # Heat dots (20 = balance darkness w/no jams)
-		  heatTime, # Lib default = 255 (max)
+		  heatTime, # Lib default = 45
 		  250)      # Heat interval (500 uS = slower but darker)
 
 
