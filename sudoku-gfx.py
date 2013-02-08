@@ -31,11 +31,10 @@ xcoord  = [ 15, 55, 95,  139, 179, 219,  263, 303, 343 ]
 ycoord  = [ 14, 54, 94,  138, 178, 218,  262, 302, 342 ]
 
 def main():
-  printer.begin(60) # Scale back the heat time a little
 
   # Due to what looks like a paste bug in Python imaging, this
   # currently uses JPEG format for the bitmaps rather than the
-  # cleaner and more optimal PNG.  The JPEG block artifacts
+  # cleaner and more optimal PNG.  But the JPEG block artifacts
   # disappear in the B/W thresholding operation.
   for i in range(9):
     numbers[i] = Image.open('gfx/' + str(i+1) + '.jpg')

@@ -24,7 +24,6 @@ from Adafruit_Thermal import *
 printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 
 def main():
-  printer.begin(150)        # Scale back the heat time a little
   printer.setLineHeight(24) # So graphical chars fit together
 
   args = sys.argv[1:]

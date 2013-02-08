@@ -1,9 +1,9 @@
-#!/usr/bin/python
-
 #*************************************************************************
 # This is a Python library for the Adafruit Thermal Printer.
 # Pick one up at --> http://www.adafruit.com/products/597
 # These printers use TTL serial to communicate, 2 pins are required.
+# IMPORTANT: On 3.3V systems (e.g. Raspberry Pi), use a 10K resistor on
+# the RX pin (TX on the printer, green wire), or simply leave unconnected.
 #
 # Adafruit invests time and resources providing this open source code.
 # Please support Adafruit and open-source hardware by purchasing products
@@ -14,36 +14,43 @@
 # MIT license, all text above must be included in any redistribution.
 #*************************************************************************
 
-# This is a 1:1 direct Python port of the Adafruit_Thermal library
-# for Arduino.  All methods use the same naming conventions as the
-# Arduino library, with only slight changes in parameter behavior
-# where needed.  This should simplify porting existing Adafruit_Thermal-
-# based printer projects to Raspberry Pi, BeagleBone, etc.
-# See printertest.py for an example.
+# This is pretty much a 1:1 direct Python port of the Adafruit_Thermal
+# library for Arduino.  All methods use the same naming conventions as the
+# Arduino library, with only slight changes in parameter behavior where
+# needed.  This should simplify porting existing Adafruit_Thermal-based
+# printer projects to Raspberry Pi, BeagleBone, etc.  See printertest.py
+# for an example.
+#
+# One significant change is the addition of the printImage() function,
+# which ties this to the Python Imaging Library and opens the door to a
+# lot of cool graphical stuff!
+#
+# TO DO:
+# - Might use standard ConfigParser library to put thermal calibration
+#   settings in a global configuration file (rather than in the library).
+# - Make this use proper Python library installation procedure.
+# - Trap errors properly.  Some stuff just falls through right now.
+# - Add docstrings throughout!
 
+# Python 2.X code using the library usu. needs to include the next line:
 from __future__ import print_function
 from serial import Serial
 import time
 
-# TODO: maybe use standard ConfigParser library to put printer heat settings
-# in a global config file (rather than the library).  But for now...
-# Also TODO: use standard Python library install procedure.
-# Also also: still need docstrings throughout!
-# And: trap errors properly.  Some stuff just falls through right now.
-
 class Adafruit_Thermal(Serial):
 
-	resumeTime    =  0.0
-	byteTime      =  0.0
-	dotPrintTime  =  0.03
-	dotFeedTime   =  0.0021
-	prevByte      = '\n'
-	column        =  0
-	maxColumn     = 32
-	charHeight    = 24
-	lineSpacing   =  8
-	barcodeHeight = 50
-	printMode     =  0
+	resumeTime      =  0.0
+	byteTime        =  0.0
+	dotPrintTime    =  0.03
+	dotFeedTime     =  0.0021
+	prevByte        = '\n'
+	column          =  0
+	maxColumn       = 32
+	charHeight      = 24
+	lineSpacing     =  8
+	barcodeHeight   = 50
+	printMode       =  0
+	defaultHeatTime = 45
 
 	def __init__(self, *args, **kwargs):
 		# If no parameters given, use default port & baud rate.
@@ -90,7 +97,7 @@ class Adafruit_Thermal(Serial):
 		# blank page may occur.  The more heating interval, the more
 		# clear, but the slower printing speed.
 
-		heatTime = kwargs.get('heattime', 45)
+		heatTime = kwargs.get('heattime', self.defaultHeatTime)
 		self.writeBytes(
 		  27,       # Esc
 		  55,       # 7 (print settings)
@@ -201,7 +208,7 @@ class Adafruit_Thermal(Serial):
 	# The bulk of this method was moved into __init__,
 	# but this is left here for compatibility with older
 	# code that might get ported directly from Arduino.
-	def begin(self, heatTime=45):
+	def begin(self, heatTime=defaultHeatTime):
 		self.writeBytes(
 		  27,       # Esc
 		  55,       # 7 (print settings)

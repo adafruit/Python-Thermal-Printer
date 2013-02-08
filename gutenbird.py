@@ -29,7 +29,6 @@ queryString = 'from:Adafruit'
 serverName  = 'search.twitter.com'
 lastId      = '1'
 printer     = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
-printer.begin(100) # Scale back the heat time, else it jams
 printer.sleep()
 
 
@@ -47,19 +46,15 @@ while True:
 		printer.inverseOn()
 		printer.print(' ' + '{:<31}'.format(tweet['from_user']))
 		printer.inverseOff()
-#		print 'User: ' + tweet['from_user']
 
 		printer.underlineOn()
 		printer.print('{:<32}'.format(tweet['created_at']))
 		printer.underlineOff()
-#		print 'Time: ' + tweet['created_at']
 
 		# Remove HTML escape sequences
 		# and remap Unicode values to nearest ASCII equivalents
 		printer.print(unidecode(
 		  HTMLParser.HTMLParser().unescape(tweet['text'])))
-#		print 'Text: ' + unidecode(HTMLParser.HTMLParser().unescape(tweet['text']))
-#		print
 
 		printer.feed(3)
 
