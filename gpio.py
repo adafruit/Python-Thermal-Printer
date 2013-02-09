@@ -3,40 +3,36 @@
 import RPi.GPIO as GPIO
 import time
 
-# Use Raspberry Pi pin numbers (not Broadcom pin numbers)
-#GPIO.setmode(GPIO.BOARD)
-# Use broadcom pins
+# Use the Broadcom pin numbers (not Raspberry Pi pin numbers)
 GPIO.setmode(GPIO.BCM)
 
-greenled    = 18
-redled      = 24
-greenbutton = 23
-redbutton   = 25
+ledGreen    = 18
+ledRed      = 24
+buttonGreen = 23
+buttonRed   = 25
 
-GPIO.setup(greenled, GPIO.OUT)
-GPIO.setup(redled  , GPIO.OUT)
-GPIO.setup(greenbutton, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(redbutton  , GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# Read pin
-#val = GPIO.input(pin)
-#print val
+GPIO.setup(ledGreen, GPIO.OUT)
+GPIO.setup(ledRed  , GPIO.OUT)
+GPIO.setup(buttonGreen, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(buttonRed  , GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 while(1):
-	GPIO.output(greenled, GPIO.HIGH)
-	GPIO.output(redled  , GPIO.LOW)
-	if(GPIO.input(greenbutton) == False):
+	GPIO.output(ledGreen, GPIO.HIGH)
+	GPIO.output(ledRed  , GPIO.LOW)
+	if(GPIO.input(buttonGreen) == False):
 		print "Green button pressed"
-	if(GPIO.input(redbutton) == False):
+		execfile('foo.py')
+	if(GPIO.input(buttonRed) == False):
 		print "Red button pressed"
-	time.sleep(1)
-	GPIO.output(greenled, GPIO.LOW)
-	GPIO.output(redled  , GPIO.HIGH)
-	if(GPIO.input(greenbutton) == False):
+#	time.sleep(1)
+	GPIO.output(ledGreen, GPIO.LOW)
+	GPIO.output(ledRed  , GPIO.HIGH)
+	if(GPIO.input(buttonGreen) == False):
 		print "Green button pressed"
-	if(GPIO.input(redbutton) == False):
+		execfile('foo.py')
+	if(GPIO.input(buttonRed) == False):
 		print "Red button pressed"
-	time.sleep(1)
+#	time.sleep(1)
 
 # Watch for 'falling' event on pin:
 # (experimental stuff)
