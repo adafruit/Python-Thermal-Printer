@@ -408,27 +408,38 @@ class Adafruit_Thermal(Serial):
 		self.underlineOn(0)
 
 
-	def printBitmap(self, w, h, bitmap):
+	def printBitmap(self, w, h, bitmap, LaaT=False):
 		rowBytes = (w + 7) / 8  # Round up to next byte boundary
 		if rowBytes >= 48:
 			rowBytesClipped = 48  # 384 pixels max width
 		else:
 			rowBytesClipped = rowBytes
 
-		# Printing bitmaps a scanline at a time (rather than
-		# in max-size chunks) makes for MUCH cleaner printing
-		# (no feed gaps), albeit a tad slower.  Worth it!
-		i = 0
-		for rowStart in range(0, h):
-			# Timeout wait happens here
-			self.writeBytes(18, 42, 1, rowBytesClipped)
+		# if LaaT (line-at-a-time) is True, print bitmaps
+		# scanline-at-a-time (rather than in chunks).
+		# This tends to make for much cleaner printing
+		# (no feed gaps) on large images...but has the
+		# opposite effect on small images that would fit
+		# in a single 'chunk', so use carefully!
+		if(LaaT): maxChunkHeight = 1
+		else:     maxChunkHeight = 255
 
-			for x in range(rowBytesClipped):
-				super(Adafruit_Thermal, self).write(
-				  chr(bitmap[i]))
-				i += 1
-			i += rowBytes - rowBytesClipped
-			self.timeoutSet(self.dotPrintTime)
+		i = 0
+		for rowStart in range(0, h, maxChunkHeight):
+			chunkHeight = h - rowStart
+			if chunkHeight > maxChunkHeight:
+				chunkHeight = maxChunkHeight
+
+			# Timeout wait happens here
+			self.writeBytes(18, 42, chunkHeight, rowBytesClipped)
+
+			for y in range(chunkHeight):
+				for x in range(rowBytesClipped):
+					super(Adafruit_Thermal, self).write(
+					  chr(bitmap[i]))
+					i += 1
+				i += rowBytes - rowBytesClipped
+			self.timeoutSet(chunkHeight * self.dotPrintTime)
 
 		self.prevByte = '\n'
 
@@ -439,7 +450,7 @@ class Adafruit_Thermal(Serial):
 	# For any other behavior (scale, B&W threshold, etc.), use
 	# the Imaging Library to perform such operations before
 	# passing the result to this function.
-	def printImage(self, image):
+	def printImage(self, image, LaaT=False):
 		import Image
 
 		if image.mode != '1':
@@ -467,7 +478,7 @@ class Adafruit_Thermal(Serial):
 					bit >>= 1
 				bitmap[n + b] = sum
 
-		self.printBitmap(width, height, bitmap)
+		self.printBitmap(width, height, bitmap, LaaT)
 
 
 	# Take the printer offline. Print commands sent after this
@@ -505,7 +516,7 @@ class Adafruit_Thermal(Serial):
 
 	# Check the status of the paper using the printers self reporting
 	# ability. Doesn't match the datasheet...
-	# Returns true for paper, false for no paper.
+	# Returns True for paper, False for no paper.
 	def hasPaper(self):
 		self.writeBytes(27, 118, 0)
 		# Bit 2 of response seems to be paper status
