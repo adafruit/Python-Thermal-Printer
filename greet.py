@@ -9,7 +9,7 @@ printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 # Because the hello/goodbye images are overall fairly light, we can
 # get away with using a darker heat time for these, then reset to the
 # default afterward.
-ht = printer.defaultHeatTime * 2
+ht = int(printer.defaultHeatTime * 1.5)
 if(ht > 255): ht = 255
 
 printer.begin(ht) # Set temporary dark heat time
