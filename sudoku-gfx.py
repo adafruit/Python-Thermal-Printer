@@ -48,7 +48,7 @@ def main():
     printer.println("PUZZLE:")
     printer.feed(1)
     printboard(puzzle)     # Doesn't print, just modifies 'bg' image
-    printer.printImage(bg) # This does the printing
+    printer.printImage(bg, True) # This does the printing
     printer.feed(1)
     printer.println("RATING:", ratepuzzle(puzzle, 4))
     if len(args) > 0:
