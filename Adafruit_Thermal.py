@@ -415,23 +415,20 @@ class Adafruit_Thermal(Serial):
 		else:
 			rowBytesClipped = rowBytes
 
+		# Printing bitmaps a scanline at a time (rather than
+		# in max-size chunks) makes for MUCH cleaner printing
+		# (no feed gaps), albeit a tad slower.  Worth it!
 		i = 0
-		for rowStart in range(0, h, 255):
-			# Issue up to 255 rows at a time:
-			chunkHeight = h - rowStart
-			if chunkHeight > 255:
-				chunkHeight = 255
-
+		for rowStart in range(0, h):
 			# Timeout wait happens here
-			self.writeBytes(18, 42, chunkHeight, rowBytesClipped)
+			self.writeBytes(18, 42, 1, rowBytesClipped)
 
-			for y in range(chunkHeight):
-				for x in range(rowBytesClipped):
-					super(Adafruit_Thermal, self).write(
-					  chr(bitmap[i]))
-					i += 1
-				i += rowBytes - rowBytesClipped
-			self.timeoutSet(chunkHeight * self.dotPrintTime)
+			for x in range(rowBytesClipped):
+				super(Adafruit_Thermal, self).write(
+				  chr(bitmap[i]))
+				i += 1
+			i += rowBytes - rowBytesClipped
+			self.timeoutSet(self.dotPrintTime)
 
 		self.prevByte = '\n'
 
