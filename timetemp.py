@@ -2,8 +2,8 @@
 
 # Current time and weather display for Raspberry Pi w/Adafruit Mini
 # Thermal Printer.  Retrieves data from Yahoo! weather, prints current
-# conditions and time using large, friendly graphics (see 'forecast.py'
-# for a different weather example that's all text-based).
+# conditions and time using large, friendly graphics.
+# See forecast.py for a different weather example that's all text-based.
 # Written by Adafruit Industries.  MIT license.
 #
 # Required software includes Adafruit_Thermal, Python Imaging and PySerial
@@ -44,28 +44,28 @@ windUnits   = dom.getElementsByTagName(
 # Although the Python Imaging Library does have nice font support,
 # I opted here to use a raster bitmap for all of the glyphs instead.
 # This allowed lots of control over kerning and such, and I didn't
-# want to spend a lot of time hinting down a good font with a
+# want to spend a lot of time hunting down a suitable font with a
 # permissive license.
 symbols = Image.open("gfx/timetemp.png")      # Bitmap w/all chars & symbols
 img     = Image.new("1", [330, 117], "white") # Working 'background' image
 draw    = ImageDraw.Draw(img)
 
 # These are the widths of certain glyphs within the 'symbols' bitmap
-TimeDigitWidth = [ 38, 29, 38, 36, 40, 35, 37, 37, 38, 37, 13 ]
-TempDigitWidth = [ 33, 25, 32, 31, 35, 30, 32, 32, 33, 32, 17, 14 ]
-DateDigitWidth = [ 16, 13, 16, 15, 17, 15, 16, 16, 16, 16 ]
-HumiDigitWidth = [ 14, 10, 14, 13, 15, 12, 13, 13, 13, 13, 17]
-DayWidth       = [ 104, 109, 62, 110, 88, 110, 95 ]
-MonthWidth     = [ 53, 52, 60, 67, 59, 63, 59, 56, 51, 48, 54, 53 ]
-DirWidth       = [ 15, 33,  19,  41,  23,  35,  12,  27 ]
-DirAngle       = [ 23, 68, 113, 157, 203, 247, 293, 336 ]
+TimeDigitWidth = [  38,  29,  38,  36,  40,  35,  37,  37, 38, 37, 13 ]
+TempDigitWidth = [  33,  25,  32,  31,  35,  30,  32,  32, 33, 32, 17, 14 ]
+DateDigitWidth = [  16,  13,  16,  15,  17,  15,  16,  16, 16, 16 ]
+HumiDigitWidth = [  14,  10,  14,  13,  15,  12,  13,  13, 13, 13, 18 ]
+DayWidth       = [ 104, 109,  62, 110,  88, 110,  95 ]
+MonthWidth     = [  53,  52,  60,  67,  59,  63,  59,  56, 51, 48, 54, 53 ]
+DirWidth       = [  23,  35,  12,  27,  15,  33,  19,  41, 23 ]
+DirAngle       = [  23,  68, 113, 157, 203, 247, 293, 336 ]
 
 # Generate a list of sub-image glyphs cropped from the symbols image
 def croplist(widths, x, y, height):
 	list = []
 	for i in range(len(widths)):
 		list.append(symbols.crop(
-		  [x, y+i*height, x + widths[i], y+(i+1)*height]))
+		  [x, y+i*height, x+widths[i], y+(i+1)*height]))
 	return list
 
 # Crop glyph lists (digits, days of week, etc.)
@@ -138,10 +138,10 @@ if(windSpeed > 0):
 		if(windDir < DirAngle[winDirNum]): break
 w  = Humidity.size[0] + 5 + numWidth(s, HumiDigit)
 w2 = Wind.size[0] + 5 + numWidth(s2, HumiDigit)
-if(windUnits == 'kph'): w2 += 3 + Kph.size[0]
-else:                   w2 += 3 + Mph.size[0]
 if(windSpeed > 0):
 	w2 += 3 + Dir[winDirNum].size[0]
+if(windUnits == 'kph'): w2 += 3 + Kph.size[0]
+else:                   w2 += 3 + Mph.size[0]
 if(w2 > w): w = w2
 
 # Draw humidity and wind
@@ -154,18 +154,14 @@ x = img.size[0] - w # Left-align again
 y += 23             # And advance to next line
 img.paste(Wind, (x, y))
 x += Wind.size[0] + 5
-x = drawNums(s2, x, y, HumiDigit) + 3
-if(windUnits == 'kph'):
-	img.paste(Mph, (x, y))
-	x += Kph.size[0]
-else:
-	img.paste(Mph, (x, y))
-	x += Mph.size[0]
 if(windSpeed > 0):
-	x += 3
 	img.paste(Dir[winDirNum], (x, y))
+	x += Dir[winDirNum].size[0] + 3
+x = drawNums(s2, x, y, HumiDigit) + 3
+if(windUnits == 'kph'): img.paste(Kph, (x, y))
+else:                   img.paste(Mph, (x, y))
 
 # Open connection to printer and print image
 printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 printer.printImage(img, True)
-printer.feed(2)
+printer.feed(3)

@@ -2,8 +2,8 @@
 
 # Weather forecast for Raspberry Pi w/Adafruit Mini Thermal Printer.
 # Retrieves data from Yahoo! weather, prints current conditions and
-# forecasts for next two days (see 'timetemp.py' for a different
-# weather example).
+# forecasts for next two days.  See timetemp.py for a different
+# weather example using nice bitmaps.
 # Written by Adafruit Industries.  MIT license.
 # 
 # Required software includes Adafruit_Thermal and PySerial libraries.
@@ -71,4 +71,3 @@ forecast(0)
 forecast(1)
 
 printer.feed(3)
-
