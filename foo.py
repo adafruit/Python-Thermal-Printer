@@ -1,125 +1,80 @@
 #!/usr/bin/python
 
+# Must be run as root (due to GPIO access)
+
 import RPi.GPIO as GPIO
 import subprocess, time
 from Adafruit_Thermal import *
 
-def tapLeft():
-	print "Tap left"
-#	subprocess.call(["python", "smalltest.py"])
-# Make this print the current time and date
+ledPin    = 18
+buttonPin = 23
+holdTime  = 2
+tapTime   = 0.01
+printer   = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 
-def tapRight():
-	print "Tap right"
-#	subprocess.call(["python", "smalltest2.py"])
-# ???
-# Current weather?
+def main():
+  # Use Broadcom pin numbers (not Raspberry Pi pin numbers)
+  GPIO.setmode(GPIO.BCM)
 
-def holdLeft():
-	print "Hold left"
-# ???
+  # Enable LED and button (w/pull-up on latter)
+  GPIO.setup(ledPin, GPIO.OUT)
+  GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-def holdRight():
-	print "Hold right"
-# ???
+  # Print greeting image here
 
-def holdBoth():
-	print "Hold both"
-	# Print 'goodbye' image and init shutdown
+  poll()
 
 
+def tap():
+  print "Tap"
+# subprocess.call(["python", "timetemp.py"])
+
+
+def hold():
+  print "Hold"
+# Print 'goodbye' image and init shutdown
+# subprocess.call("sync")
+# subprocess.call(["shutdown", "-h", "now"])
+
+
+# Need to make this poll twitter every 30 seconds
+# And print sudoku and weather forecast once a day
 def poll():
-	# Get initial button state and time
-	pstate = 0
-	if(GPIO.input(buttonGreen) == False): pstate += 1
-	if(GPIO.input(buttonRed)   == False): pstate += 2
-	ptime = time.clock()
-	tflag = False
-	hflag = False
-	tstate = 0
 
-	while(True):
+  # Poll initial button state and time
+  prevButtonState = GPIO.input(buttonPin)
+  prevTime        = time.clock()
+  tapEnable       = False
+  holdEnable      = False
 
-		# Get new button state and current time
-		state = 0
-		if(GPIO.input(buttonGreen) == False): state += 1
-		if(GPIO.input(buttonRed)   == False): state += 2
-		t = time.clock()
+  while(True):
 
-		# Has button state changed?
-		if(state != pstate):
-			# Yes...save new state/time
-			pstate = state
-			ptime  = t
-		else:
-			# Button state is consistent.
-			# Has it been held more than 'holdTime'?
-			if((t - ptime) >= holdTime):
-				# Yes.  Is the hold action as-yet untriggered?
-				if(hflag == False):
-					# Yes...
-					if(state == 1):
-						holdLeft()
-					elif(state == 2):
-						holdRight()
-					elif(state == 3):
-						holdBoth()
-					hflag = True # Don't repeat hold action
-					tflag = True # Don't do tap action on release
-			# No, hasn't been holdTime yet.  Has tapTime elapsed?
-			elif((t - ptime) >= tapTime):
-				# Yes.  Button(s) released?
-				if(state == 0):
-					# Yes.  Debounced tap.
-					if(tflag == False):
-						if(hflag == False):
-							# Release
-							if(tstate == 1):
-								tapLeft()
-							elif(tstate == 2):
-								tapRight()
-							# There is no tap-both
-						# Tap triggered; disable
-						tflag = True
-					hflag = False # Enable hold
-				else:
-					# Button pressed.  Enable tap action
-					# and record button state.
-					tflag  = False
-					tstate = state
+    # Poll current button state and time
+    buttonState = GPIO.input(buttonPin)
+    t           = time.clock()
+
+    # Has button state changed?
+    if(buttonState != prevButtonState):
+      prevButtonState = buttonState    # Yes, save new state/time
+      prevTime        = t
+    else:                              # Button state unchanged
+      if((t - prevTime) >= holdTime):  # Button held more than 'holdTime'?
+        # Yes it has.  Is the hold action as-yet untriggered?
+        if(holdEnable == True):        # Yep!
+          hold()                       # Perform hold action (usu. shutdown)
+          holdEnable = False           # 1 shot...don't repeat hold action
+          tapEnable  = False           # Don't do tap action on release
+      elif((t - prevTime) >= tapTime): # Not holdTime.  tapTime elapsed?
+        # Yes.  Debounced press or release...
+        if(buttonState == True):       # Button released?
+          if(tapEnable == True):       # Ignore if prior hold()
+            tap()                      # Tap triggered (button released)
+            tapEnable  = False         # Disable tap and hold
+            holdEnable = False
+        else:                          # Button pressed
+          tapEnable  = True            # Enable tap and hold actions
+          holdEnable = True
 
 
-
-
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
-printer.println("Hello!")
-
-
-# Use the Broadcom pin numbers (not Raspberry Pi pin numbers)
-GPIO.setmode(GPIO.BCM)
-
-ledGreen    = 18
-ledRed      = 24
-buttonGreen = 23
-buttonRed   = 25
-
-GPIO.setup(ledGreen, GPIO.OUT)
-GPIO.setup(ledRed  , GPIO.OUT)
-GPIO.setup(buttonGreen, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(buttonRed  , GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-holdTime = 2
-tapTime  = 0.01
-
-
-poll()
-
-
-
-#!/usr/bin/python
-
-#import subprocess, time
-#
-#subprocess.call("sync")
-#subprocess.call(["shutdown", "-h", "now"])
-
+if __name__ == '__main__':
+  main()
