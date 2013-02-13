@@ -12,15 +12,15 @@ printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 ht = int(printer.defaultHeatTime * 1.5)
 if(ht > 255): ht = 255
 
-printer.begin(ht) # Set temporary dark heat time
+#printer.begin(ht) # Set temporary dark heat time
 img      = Image.open('gfx/hello.png')
 printer.printImage(img, True)
 printer.feed(3)
-printer.begin() # Reset default heat time
+#printer.begin() # Reset default heat time
 
-printer.begin(ht) # Set temporary dark heat time
+#printer.begin(ht) # Set temporary dark heat time
 img      = Image.open('gfx/goodbye.png')
 printer.printImage(img, True)
 printer.feed(3)
-printer.begin() # Reset default heat time
+#printer.begin() # Reset default heat time
 
