@@ -40,8 +40,8 @@ def hold():
   GPIO.output(ledPin, GPIO.HIGH)
   printer.printImage(Image.open('gfx/goodbye.png'), True)
   printer.feed(3)
-# subprocess.call("sync")
-# subprocess.call(["shutdown", "-h", "now"])
+  subprocess.call("sync")
+  subprocess.call(["shutdown", "-h", "now"])
   GPIO.output(ledPin, GPIO.LOW)
 
 
