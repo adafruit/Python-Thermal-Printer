@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Current time and weather display for Raspberry Pi w/Adafruit Mini
+# Current time and temperature display for Raspberry Pi w/Adafruit Mini
 # Thermal Printer.  Retrieves data from Yahoo! weather, prints current
 # conditions and time using large, friendly graphics.
 # See forecast.py for a different weather example that's all text-based.
@@ -102,7 +102,7 @@ def numWidth(str, list):
 	w = 0 # Cumulative width
 	for i in range(len(str)):
 		d = ord(str[i]) - ord('0')
-		if(i > 0): w += 1    # Space between digits
+		if i > 0: w += 1     # Space between digits
 		w += list[d].size[0] # Digit width
 	return w
 
@@ -113,7 +113,7 @@ drawNums(time.strftime("%H:%M", t), x, y, TimeDigit)
 # Determine wider of day-of-week or date (for alignment)
 s = str(t.tm_mday) # Convert day of month to a string
 w = MonthWidth[t.tm_mon - 1] + 6 + numWidth(s, DateDigit)
-if(DayWidth[t.tm_wday] > w): w = DayWidth[t.tm_wday]
+if DayWidth[t.tm_wday] > w: w = DayWidth[t.tm_wday]
 
 # Draw day-of-week and date
 x = img.size[0] - w                    # Left alignment for two lines
@@ -133,16 +133,16 @@ drawNums(s, x, y, TempDigit)
 s  = str(humidity) + ':' # Appends percent glyph
 s2 = str(windSpeed)
 winDirNum = 0  # Wind direction glyph number
-if(windSpeed > 0):
+if windSpeed > 0:
 	for winDirNum in range(len(DirAngle) - 1):
-		if(windDir < DirAngle[winDirNum]): break
+		if windDir < DirAngle[winDirNum]: break
 w  = Humidity.size[0] + 5 + numWidth(s, HumiDigit)
 w2 = Wind.size[0] + 5 + numWidth(s2, HumiDigit)
-if(windSpeed > 0):
+if windSpeed > 0:
 	w2 += 3 + Dir[winDirNum].size[0]
-if(windUnits == 'kph'): w2 += 3 + Kph.size[0]
-else:                   w2 += 3 + Mph.size[0]
-if(w2 > w): w = w2
+if windUnits == 'kph': w2 += 3 + Kph.size[0]
+else:                  w2 += 3 + Mph.size[0]
+if w2 > w: w = w2
 
 # Draw humidity and wind
 x = img.size[0] - w # Left-align the two lines
@@ -154,12 +154,12 @@ x = img.size[0] - w # Left-align again
 y += 23             # And advance to next line
 img.paste(Wind, (x, y))
 x += Wind.size[0] + 5
-if(windSpeed > 0):
+if windSpeed > 0:
 	img.paste(Dir[winDirNum], (x, y))
 	x += Dir[winDirNum].size[0] + 3
 x = drawNums(s2, x, y, HumiDigit) + 3
-if(windUnits == 'kph'): img.paste(Kph, (x, y))
-else:                   img.paste(Mph, (x, y))
+if windUnits == 'kph': img.paste(Kph, (x, y))
+else:                  img.paste(Mph, (x, y))
 
 # Open connection to printer and print image
 printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)

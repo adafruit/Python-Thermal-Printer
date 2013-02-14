@@ -34,4 +34,3 @@ for i in range(0,256,15):
 
 printer.begin() # Reset heat time to default
 printer.feed(4)
-

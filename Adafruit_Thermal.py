@@ -421,8 +421,8 @@ class Adafruit_Thermal(Serial):
 		# (no feed gaps) on large images...but has the
 		# opposite effect on small images that would fit
 		# in a single 'chunk', so use carefully!
-		if(LaaT): maxChunkHeight = 1
-		else:     maxChunkHeight = 255
+		if LaaT: maxChunkHeight = 1
+		else:    maxChunkHeight = 255
 
 		i = 0
 		for rowStart in range(0, h, maxChunkHeight):

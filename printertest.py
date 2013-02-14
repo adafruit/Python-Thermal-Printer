@@ -66,4 +66,3 @@ printer.feed(1)
 printer.sleep()      # Tell printer to sleep
 printer.wake()       # Call wake() before printing again, even if reset
 printer.setDefault() # Restore printer to defaults
-
