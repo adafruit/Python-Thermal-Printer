@@ -73,7 +73,12 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(ledPin, GPIO.OUT)
 GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Print greeting image (LED on while working)
+# LED on while working
+GPIO.output(ledPin, GPIO.HIGH)
+# Let other startup processes work a bit, else some gibberish
+# may follow the greeting image.
+time.sleep(30)
+# Print greeting image
 GPIO.output(ledPin, GPIO.HIGH)
 printer.printImage(Image.open('gfx/hello.png'), True)
 printer.feed(3)
