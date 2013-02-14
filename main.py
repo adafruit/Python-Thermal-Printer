@@ -75,11 +75,10 @@ GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # LED on while working
 GPIO.output(ledPin, GPIO.HIGH)
-# Let other startup processes work a bit, else some gibberish
-# may follow the greeting image.
+# Processor load is heavy at startup; wait a moment to avoid
+# stalling during greeting.
 time.sleep(30)
 # Print greeting image
-GPIO.output(ledPin, GPIO.HIGH)
 printer.printImage(Image.open('gfx/hello.png'), True)
 printer.feed(3)
 GPIO.output(ledPin, GPIO.LOW)
