@@ -81,7 +81,7 @@ GPIO.output(ledPin, GPIO.LOW)
 
 # Poll initial button state and time
 prevButtonState = GPIO.input(buttonPin)
-prevTime        = time.clock()
+prevTime        = time.time()
 tapEnable       = False
 holdEnable      = False
 
@@ -90,7 +90,7 @@ while(True):
 
   # Poll current button state and time
   buttonState = GPIO.input(buttonPin)
-  t           = time.clock()
+  t           = time.time()
 
   # Has button state changed?
   if buttonState != prevButtonState:
@@ -138,4 +138,6 @@ while(True):
   # import thing.
   if t > nextInterval:
     nextInterval = t + 30.0
-    lastId = interval()
+    result = interval()
+    if result is not None:
+      lastId = result

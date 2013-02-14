@@ -34,7 +34,7 @@ else:                 lastId = '1'
 
 url    = ('http://search.twitter.com/search.json?' +
           urllib.urlencode(dict(q=queryString)) +
-          '&rpp=5&since_id=' + lastId)
+          '&rpp=3&since_id=' + lastId)
 data   = json.load(urllib.urlopen(url))
 lastId = data['max_id_str']
 
