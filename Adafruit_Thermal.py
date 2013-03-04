@@ -41,8 +41,8 @@ class Adafruit_Thermal(Serial):
 
 	resumeTime      =  0.0
 	byteTime        =  0.0
-	dotPrintTime    =  0.03
-	dotFeedTime     =  0.0021
+	dotPrintTime    =  0.033
+	dotFeedTime     =  0.0025
 	prevByte        = '\n'
 	column          =  0
 	maxColumn       = 32

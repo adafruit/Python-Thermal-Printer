@@ -14,8 +14,9 @@
 # http://www.adafruit.com/products/597 Mini Thermal Receipt Printer
 # http://www.adafruit.com/products/600 Printer starter pack
 
+from __future__ import print_function
 import RPi.GPIO as GPIO
-import subprocess, time, Image
+import subprocess, time, Image, socket
 from Adafruit_Thermal import *
 
 ledPin       = 18
@@ -75,9 +76,26 @@ GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # LED on while working
 GPIO.output(ledPin, GPIO.HIGH)
+
 # Processor load is heavy at startup; wait a moment to avoid
 # stalling during greeting.
 time.sleep(30)
+
+# Show IP address (if network is available)
+try:
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.connect(('8.8.8.8', 0))
+	printer.print('My IP address is ' + s.getsockname()[0])
+	printer.feed(3)
+except:
+	printer.boldOn()
+	printer.println('Network is unreachable.')
+	printer.boldOff()
+	printer.print('Connect display and keyboard\n'
+	  'for network troubleshooting.')
+	printer.feed(3)
+	exit(0)
+
 # Print greeting image
 printer.printImage(Image.open('gfx/hello.png'), True)
 printer.feed(3)
