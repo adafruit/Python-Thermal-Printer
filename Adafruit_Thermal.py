@@ -308,7 +308,7 @@ class Adafruit_Thermal(Serial):
 
 	def normal(self):
 		self.printMode = 0
-		writePrintMode()
+		self.writePrintMode()
 
 	def inverseOn(self):
 		self.setPrintMode(self.INVERSE_MASK)
