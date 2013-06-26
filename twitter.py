@@ -62,7 +62,9 @@ def issueRequestAndDecodeResponse(method, url, body, headers):
   connection.request(method, url, body, headers)
   response = connection.getresponse()
   if response.status != 200:
-    print('HTTP error: %d' % response.status)
+    # This is OK for command-line testing, otherwise 
+    # keep it commented out when using main.py
+    # print('HTTP error: %d' % response.status)
     exit(-1)
   compressed = response.read()
   connection.close()
