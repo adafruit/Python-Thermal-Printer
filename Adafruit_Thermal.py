@@ -504,8 +504,11 @@ class Adafruit_Thermal(Serial):
 
 
 	def wake(self):
+		self.timeoutSet(0);
 		self.writeBytes(255)
-		self.timeoutSet(0.5)
+		for i in range(10):
+			self.writeBytes(27)
+			self.timeoutSet(0.1)
 
 
 	# Empty method, included for compatibility
