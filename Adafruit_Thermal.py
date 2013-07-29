@@ -291,9 +291,9 @@ class Adafruit_Thermal(Serial):
 		self.printMode |= mask
 		self.writePrintMode()
 		if self.printMode & self.DOUBLE_HEIGHT_MASK:
-			self.charHeight = 24
-		else:
 			self.charHeight = 48
+		else:
+			self.charHeight = 24
 		if self.printMode & self.DOUBLE_WIDTH_MASK:
 			self.maxColumn  = 16
 		else:
@@ -302,6 +302,14 @@ class Adafruit_Thermal(Serial):
 	def unsetPrintMode(self, mask):
 		self.printMode &= ~mask
 		self.writePrintMode()
+		if self.printMode & self.DOUBLE_HEIGHT_MASK:
+			self.charHeight = 48
+		else:
+			self.charHeight = 24
+		if self.printMode & self.DOUBLE_WIDTH_MASK:
+			self.maxColumn  = 16
+		else:
+			self.maxColumn  = 32
 
 	def writePrintMode(self):
 		self.writeBytes(27, 33, self.printMode)
