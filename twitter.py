@@ -62,7 +62,7 @@ def issueRequestAndDecodeResponse(method, url, body, headers):
   connection.request(method, url, body, headers)
   response = connection.getresponse()
   if response.status != 200:
-    # This is OK for command-line testing, otherwise 
+    # This is OK for command-line testing, otherwise
     # keep it commented out when using main.py
     # print('HTTP error: %d' % response.status)
     exit(-1)
@@ -101,6 +101,8 @@ data = issueRequestAndDecodeResponse(
 
 # Display results. ---------------------------------------------------------
 
+maxId = data['search_metadata']['max_id_str']
+
 for tweet in data['statuses']:
 
   printer.inverseOn()
@@ -111,6 +113,10 @@ for tweet in data['statuses']:
   printer.print('{:<32}'.format(tweet['created_at']))
   printer.underlineOff()
 
+  # max_id_str is not always present, so check tweet IDs as fallback
+  id = tweet['id_str']
+  if(id > maxId): maxId = id # String compare is OK for this
+
   # Remove HTML escape sequences
   # and remap Unicode values to nearest ASCII equivalents
   printer.print(unidecode(
@@ -118,4 +124,4 @@ for tweet in data['statuses']:
 
   printer.feed(3)
 
-print(data['search_metadata']['max_id_str']) # Piped back to calling process
+print(maxId) # Piped back to calling process
