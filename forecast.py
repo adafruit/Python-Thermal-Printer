@@ -25,6 +25,11 @@ from xml.dom.minidom import parseString
 # current URL string and paste it here.
 WOEID = '2459115'
 
+# Select the units for degrees (Fahrenheit, f or Celsius, c).
+# Changing the temperature unit also changes the other units. Imperial 
+# for Fahrenheit and Metric for Celsius.
+tempUnit = 'f'
+
 # Dumps one forecast line to the printer
 def forecast(idx):
 	tag     = 'yweather:forecast'
@@ -43,7 +48,8 @@ deg     = chr(0xf8) # Degree symbol on thermal printer
 
 # Fetch forecast data from Yahoo!, parse resulting XML
 dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+        'http://weather.yahooapis.com/forecastrss?u=' + tempUnit + 
+        '&w=' + WOEID).read())
 
 # Print heading
 printer.inverseOn()
