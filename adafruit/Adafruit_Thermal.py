@@ -379,7 +379,7 @@ class Adafruit_Thermal(Serial):
     # Feeds by the specified number of individual pixel rows
     def feedRows(self, rows):
         self.writeBytes(27, 74, rows)
-        self.timeoutSet(rows * dotFeedTime)
+        self.timeoutSet(rows * self.dotFeedTime)
 
 
     def flush(self):
@@ -460,7 +460,7 @@ class Adafruit_Thermal(Serial):
     # the Imaging Library to perform such operations before
     # passing the result to this function.
     def printImage(self, image, LaaT=False):
-        import Image
+        # import Image
 
         if image.mode != '1':
             image = image.convert('1')
