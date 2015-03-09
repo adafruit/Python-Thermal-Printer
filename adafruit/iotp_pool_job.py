@@ -1,16 +1,28 @@
+from __future__ import print_function
 __author__ = 'frza'
+
+import textwrap
+
+
+class SimpleTextJob(object):
+    def __init__(self, text):
+        self._text = text
+
+    def with_printer(self, printer):
+        wrapped = textwrap.wrap(self._text, width=32)
+        for line in wrapped:
+            printer.print(line + '\n')
 
 
 class ImageJob(object):
     def __init__(self, image):
         self._image = image
-        self._preprocess()
 
-    @property
-    def image(self):
-        return self._image
+    def with_printer(self, printer):
+        img = self._pre_process()
+        printer.printImage(img)
 
-    def _preprocess(self):
+    def _pre_process(self):
         img = self._image
         if img.mode != '1' or img.mode != 'L':
             img = img.convert(mode='1')
@@ -31,5 +43,14 @@ class ImageJob(object):
         if w > 384:
             img = img.rotate(90)
 
-        # save
-        self._image = img
+        return img
+
+
+def create_job(obj):
+    t = obj.get('type', None)
+    if t is None:
+        return None
+    if t == 'simple_text':
+        return SimpleTextJob(obj.get('text', ''))
+    # elif t == 'image':
+    return None

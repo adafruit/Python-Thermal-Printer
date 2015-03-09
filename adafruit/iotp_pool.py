@@ -3,7 +3,7 @@ __author__ = 'frza'
 from Queue import Queue
 from threading import Thread
 from adafruit.Adafruit_Thermal import Adafruit_Thermal
-from adafruit.iotp_pool_job import ImageJob
+# from adafruit.iotp_pool_job import ImageJob
 
 _q = Queue()
 
@@ -21,13 +21,11 @@ def size():
 
 
 def _perform(printer, job):
-    if job is ImageJob:
-        printer.printImage(job.image)
-    else:
-        print "job not supported"
+    job.with_printer(printer)
 
 
 def _worker(printer):
+    print "Printer Job Queue started"
     while True:
         item = _q.get()
         if item == '__quit__':
