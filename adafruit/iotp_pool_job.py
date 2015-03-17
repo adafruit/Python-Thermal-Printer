@@ -1,24 +1,62 @@
 from __future__ import print_function
 __author__ = 'frza'
-
+import uuid
 import textwrap
+import time
 
 
-class SimpleTextJob(object):
+class BaseJob(object):
+    def __init__(self):
+        self._id = uuid.uuid4()
+        self._state = 'created'
+        self._ts = -1
+
+    def queued(self):
+        self._state = 'queued'
+
+    @property
+    def remove(self):
+        return self.state == 'done' and int(time.time()) - self._ts > 30 * 60 * 1000
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def id_str(self):
+        return str(self._id)
+
+    @property
+    def state(self):
+        return self._state
+
+    def run(self, printer):
+        self._state = 'running'
+        self._with_printer(printer)
+        self._state = 'done'
+        self._ts = int(time.time())
+
+    def _with_printer(self, printer):
+        raise Exception('implement-me')
+
+
+class SimpleTextJob(BaseJob):
     def __init__(self, text):
+        super(SimpleTextJob, self).__init__()
         self._text = text
 
-    def with_printer(self, printer):
+    def _with_printer(self, printer):
         wrapped = textwrap.wrap(self._text, width=32)
         for line in wrapped:
             printer.print(line + '\n')
 
 
-class ImageJob(object):
+class ImageJob(BaseJob):
     def __init__(self, image):
+        super(ImageJob, self).__init__()
         self._image = image
 
-    def with_printer(self, printer):
+    def _with_printer(self, printer):
         img = self._pre_process()
         printer.printImage(img)
 
