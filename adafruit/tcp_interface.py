@@ -31,8 +31,10 @@ class IotpTCPHandler(SocketServer.BaseRequestHandler):
                     else:
                         j = create_job(obj)
                         if j is not None:
-                            enqueue(j)
-                            rsp = msgpack.packb({'status': 'queued', 'job_id': str(j.id)})
+                            if enqueue(j):
+                                rsp = msgpack.packb({'status': 'queued', 'job_id': str(j.id)})
+                            else:
+                                rsp = msgpack.packb({'status': 'rejected', 'reason': 'queue_full', 'job_id': str(j.id)})
                             self.request.send(rsp)
                         else:
                             self.send_err()

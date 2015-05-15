@@ -1,9 +1,9 @@
 __author__ = 'frza'
 
-from Queue import Queue
+from Queue import Queue, Full
 from threading import Thread
 
-_q = Queue()
+_q = Queue(maxsize=100)
 
 all_jobs = {}
 
@@ -29,7 +29,11 @@ def enqueue(job):
         for jid in rm:
             print "Removing old job {}".format(jid)
             del(all_jobs[jid])
-    _q.put_nowait(job)
+    try:
+        _q.put_nowait(job)
+        return True
+    except Full:
+        return False
 
 
 def teardown():
