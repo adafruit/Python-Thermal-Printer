@@ -39,7 +39,7 @@ class IotpTCPHandler(SocketServer.BaseRequestHandler):
                         else:
                             self.send_err()
             except Exception as err:
-                print "Exception: {}".format(err)
+                print "TCP Exception: {}".format(err)
                 self.send_err()
                 break
 
