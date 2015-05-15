@@ -13,5 +13,6 @@ setup(name='iotp_pool',
       install_requires=['pyserial',
                         'pillow',
                         'msgpack-python',
+                        'pika',
                         ],
       )
