@@ -53,7 +53,7 @@ class SimpleTextJob(BaseJob):
         if self._wrap:
             wrapped = textwrap.wrap(self._text, width=32)
         else:
-            wrapped = self._text
+            wrapped = [self._text]
         for line in wrapped:
             printer.print(line + '\n')
 
