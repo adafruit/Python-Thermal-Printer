@@ -3,6 +3,8 @@ __author__ = 'frza'
 import uuid
 import textwrap
 import time
+from StringIO import StringIO
+from PIL import Image
 
 
 class BaseJob(object):
@@ -90,5 +92,6 @@ def create_job(obj):
         return None
     if t == 'simple_text':
         return SimpleTextJob(obj.get('text', ''))
-    # elif t == 'image':
+    elif t == 'image':
+        return ImageJob(image=Image.open(StringIO(obj.get('image_file'))))
     return None
