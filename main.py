@@ -3,6 +3,7 @@ __author__ = 'frza'
 
 from adafruit import iotp_pool
 from adafruit.tcp_interface import IotpTCPServer
+from adafruit.amqp_interface import IotpAMQPServer
 import time
 import signal
 
@@ -29,10 +30,14 @@ def main(config):
     tcp_intf = IotpTCPServer(config)
     tcp_intf.start()
 
+    amqp_intf = IotpAMQPServer(config)
+    amqp_intf.start()
+
     while iotp_pool.is_running():
         time.sleep(1)
 
     tcp_intf.stop()
+    amqp_intf.stop()
 
 
 def activate_signal_handler(signal_handler_fun):
@@ -53,6 +58,10 @@ if __name__ == '__main__':
     activate_signal_handler(exit_handler)
 
     c = {'printer_type': 'test',
+         # tcp props
          'TCP_HOST': '0.0.0.0',
-         'TCP_PORT': 9999}
+         'TCP_PORT': 9999,
+         # amqp props
+         'AMQP_HOST': 'localhost'
+        }
     main(c)
