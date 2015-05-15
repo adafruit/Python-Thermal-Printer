@@ -1,0 +1,6 @@
+[forecast]
+woeid=<your local woeid>
+
+[twitter]
+consumer-key=<your twitter consumer key>
+consumer-secret=<your twitter consumer secret>
