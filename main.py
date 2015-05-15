@@ -53,6 +53,6 @@ if __name__ == '__main__':
     activate_signal_handler(exit_handler)
 
     c = {'printer_type': 'test',
-         'TCP_HOST': 'localhost',
+         'TCP_HOST': '0.0.0.0',
          'TCP_PORT': 9999}
     main(c)
