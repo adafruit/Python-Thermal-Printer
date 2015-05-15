@@ -33,22 +33,27 @@ class BaseJob(object):
         return self._state
 
     def run(self, printer):
-        self._state = 'running'
-        self._with_printer(printer)
-        self._state = 'done'
-        self._ts = int(time.time())
+        if self._state == 'queued':
+            self._state = 'running'
+            self._with_printer(printer)
+            self._state = 'done'
+            self._ts = int(time.time())
 
     def _with_printer(self, printer):
         raise Exception('implement-me')
 
 
 class SimpleTextJob(BaseJob):
-    def __init__(self, text):
+    def __init__(self, text, wrap=True):
         super(SimpleTextJob, self).__init__()
         self._text = text
+        self._wrap = wrap
 
     def _with_printer(self, printer):
-        wrapped = textwrap.wrap(self._text, width=32)
+        if self._wrap:
+            wrapped = textwrap.wrap(self._text, width=32)
+        else:
+            wrapped = self._text
         for line in wrapped:
             printer.print(line + '\n')
 
@@ -61,6 +66,8 @@ class ImageJob(BaseJob):
     def _with_printer(self, printer):
         img = self._pre_process()
         printer.printImage(img)
+        # remove image object immediately
+        self._image = None
 
     def _pre_process(self):
         img = self._image
@@ -91,7 +98,7 @@ def create_job(obj):
     if t is None:
         return None
     if t == 'simple_text':
-        return SimpleTextJob(obj.get('text', ''))
+        return SimpleTextJob(text=obj.get('text', ''), wrap=obj.get('wrap', False))
     elif t == 'image':
         return ImageJob(image=Image.open(StringIO(obj.get('image_file'))))
     return None
