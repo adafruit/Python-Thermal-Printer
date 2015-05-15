@@ -37,7 +37,7 @@ def enqueue(job):
 
 
 def teardown():
-    enqueue('__quit__')
+    _q.put_nowait('__quit__')
 
 
 def size():
