@@ -34,6 +34,8 @@ class IotpTCPHandler(SocketServer.BaseRequestHandler):
                             enqueue(j)
                             rsp = msgpack.packb({'status': 'queued', 'job_id': str(j.id)})
                             self.request.send(rsp)
+                        else:
+                            self.send_err()
             except Exception as err:
                 print "Exception: {}".format(err)
                 self.send_err()
