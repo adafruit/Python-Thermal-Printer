@@ -28,6 +28,7 @@
 
 from __future__ import print_function
 import base64, HTMLParser, httplib, json, sys, urllib, zlib
+import ConfigParser
 from unidecode import unidecode
 from Adafruit_Thermal import *
 
@@ -35,14 +36,18 @@ from Adafruit_Thermal import *
 # Configurable globals.  Edit to your needs. -------------------------------
 
 # Twitter application credentials -- see notes above -- DO NOT SHARE.
-consumer_key    = 'PUT_YOUR_CONSUMER_KEY_HERE'
-consumer_secret = 'PUT_YOUR_CONSUMER_SECRET_HERE'
+# These have been moved to the config file.
+config = ConfigParser.SafeConfigParser({'query-string': 'from:Adafruit'})
+config.read('options.cfg')
+consumer_key = config.get('twitter', 'consumer-key')
+consumer_secret = config.get('twitter', 'consumer-secret')
+queryString = config.get('twitter', 'query-string')
 
 # queryString can be any valid Twitter API search string, including
 # boolean operators.  See http://dev.twitter.com/docs/using-search
 # for options and syntax.  Funny characters do NOT need to be URL
 # encoded here -- urllib takes care of that.
-queryString = 'from:Adafruit'
+# This has been moved to the config file.
 
 
 # Other globals.  You probably won't need to change these. -----------------

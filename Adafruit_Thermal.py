@@ -36,6 +36,7 @@
 from __future__ import print_function
 from serial import Serial
 import time
+import ConfigParser
 
 class Adafruit_Thermal(Serial):
 
@@ -51,8 +52,27 @@ class Adafruit_Thermal(Serial):
 	barcodeHeight   = 50
 	printMode       =  0
 	defaultHeatTime = 60
+	defaultHeatDots	= 20
+	defaultHeatInterval = 250
 
 	def __init__(self, *args, **kwargs):
+		# Attempt to read printer options from config
+		heatTime = self.defaultHeatTime
+		heatDots = self.defaultHeatDots
+		heatInterval = self.defaultHeatInterval
+		try:
+			config = ConfigParser.SafeConfigParser({
+				'heat-time': str(heatTime),
+				'heat-dots': str(heatDots),
+				'heat-interval': str(heatInterval)
+			})
+			config.read('options.cfg')
+			heatTime = int(config.get('printer', 'heat-time'))
+			heatDots = int(config.get('printer', 'heat-dots'))
+			heatInterval = int(config.get('printer', 'heat-interval'))
+		except:
+			pass
+
 		# If no parameters given, use default port & baud rate.
 		# If only port is passed, use default baud rate.
 		# If both passed, use those values.
@@ -97,13 +117,15 @@ class Adafruit_Thermal(Serial):
 		# blank page may occur.  The more heating interval, the more
 		# clear, but the slower printing speed.
 
-		heatTime = kwargs.get('heattime', self.defaultHeatTime)
+		# heattime argument overrides config
+		heatTime = kwargs.get('heattime', heatTime)
+
 		self.writeBytes(
 		  27,       # Esc
 		  55,       # 7 (print settings)
-		  20,       # Heat dots (20 = balance darkness w/no jams)
+		  heatDots,       # Heat dots (20 = balance darkness w/no jams)
 		  heatTime, # Lib default = 45
-		  250)      # Heat interval (500 uS = slower but darker)
+		  heatInterval)      # Heat interval (500 uS = slower but darker)
 
 		# Description of print density from page 23 of the manual:
 		# DC2 # n Set printing density
@@ -317,12 +339,13 @@ class Adafruit_Thermal(Serial):
 	def normal(self):
 		self.printMode = 0
 		self.writePrintMode()
+		self.inverseOff()
 
 	def inverseOn(self):
-		self.setPrintMode(self.INVERSE_MASK)
+		self.writeBytes(29, 66, 1)
 
 	def inverseOff(self):
-		self.unsetPrintMode(self.INVERSE_MASK)
+		self.writeBytes(29, 66, 0)
 
 	def upsideDownOn(self):
 		self.setPrintMode(self.UPDOWN_MASK)
