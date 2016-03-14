@@ -44,7 +44,7 @@ setup(name='Adafruit_Thermal',
       packages=['Adafruit_Thermal'],
       zip_safe=False,
       classifiers=[
-          'License :: OSI Approved :: MIT',
+          'License :: OSI Approved :: MIT License',
           'Intended Audience :: Developers',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 2.7',
