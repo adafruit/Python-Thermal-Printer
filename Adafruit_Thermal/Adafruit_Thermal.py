@@ -11,6 +11,7 @@
 #
 # Written by Limor Fried/Ladyada for Adafruit Industries.
 # Python port by Phil Burgess for Adafruit Industries.
+# See `AUTHORS` for a full list of contributors
 # MIT license, all text above must be included in any redistribution.
 #*************************************************************************
 
@@ -28,7 +29,6 @@
 # TO DO:
 # - Might use standard ConfigParser library to put thermal calibration
 #   settings in a global configuration file (rather than in the library).
-# - Make this use proper Python library installation procedure.
 # - Trap errors properly.  Some stuff just falls through right now.
 
 # Python 2.X code using the library usu. needs to include the next line:
@@ -583,7 +583,7 @@ then converted to 1-bit with diffusion dithering.
 Any other image manipulation should be done on the image prior
 passing it this method."""
 
-                import Image
+                from PIL import Image
 
                 if image.mode != '1':
                         image = image.convert('1')
