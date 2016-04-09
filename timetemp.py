@@ -27,7 +27,8 @@ WOEID = '2459115'
 
 # Fetch weather data from Yahoo!, parse resulting XML
 dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+#        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())        
 
 # Extract values relating to current temperature, humidity, wind
 temperature = int(dom.getElementsByTagName(
