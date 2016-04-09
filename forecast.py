@@ -43,7 +43,8 @@ deg     = chr(0xf8) # Degree symbol on thermal printer
 
 # Fetch forecast data from Yahoo!, parse resulting XML
 dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+#        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+        'http://xml.weather.yahoo.com/forecastrss?w=' + WOEID).read())        
 
 # Print heading
 printer.inverseOn()
