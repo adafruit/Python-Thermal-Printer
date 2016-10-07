@@ -15,6 +15,7 @@
 
 from __future__ import print_function
 import urllib, time
+import ConfigParser
 from Adafruit_Thermal import *
 from xml.dom.minidom import parseString
 
@@ -23,7 +24,7 @@ from xml.dom.minidom import parseString
 # by 'manually' visiting http://weather.yahoo.com, entering a location
 # and requesting a forecast, then copy the number from the end of the
 # current URL string and paste it here.
-WOEID = '2459115'
+# (note that this value has moved to the config file)
 
 # Dumps one forecast line to the printer
 def forecast(idx):
@@ -38,12 +39,16 @@ def forecast(idx):
 	printer.print(deg)
 	printer.println(' ' + cond)
 
+config = ConfigParser.SafeConfigParser({'woeid': '2459115'}) # Default to NYC
+config.read('options.cfg')
+woeid = config.get('forecast', 'woeid')
+
 printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
 deg     = chr(0xf8) # Degree symbol on thermal printer
 
 # Fetch forecast data from Yahoo!, parse resulting XML
 dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+        'http://weather.yahooapis.com/forecastrss?w=' + woeid).read())
 
 # Print heading
 printer.inverseOn()

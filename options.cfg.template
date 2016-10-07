@@ -1,0 +1,18 @@
+[forecast]
+woeid=<your local woeid>
+
+[twitter]
+consumer-key=<your twitter consumer key>
+consumer-secret=<your twitter consumer secret>
+query-string=from:Adafruit
+
+[printer]
+# Defaults from Adafruit
+#heat-time=60
+#heat-dots=20
+#heat-interval=250
+# Works better for v2.68 printer
+heat-time=80
+heat-dots=7
+heat-interval=2
+
