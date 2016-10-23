@@ -32,6 +32,12 @@
 # - Trap errors properly.  Some stuff just falls through right now.
 # - Add docstrings throughout!
 
+#===============================================================================
+# Modification by Dennis Jung
+#
+# - Make module usable for Python3 and Raspberry Pi 3
+#===============================================================================
+
 # Python 2.X code using the library usu. needs to include the next line:
 from __future__ import print_function
 from serial import Serial
@@ -58,7 +64,7 @@ class Adafruit_Thermal(Serial):
 		# If both passed, use those values.
 		baudrate = 19200
 		if len(args) == 0:
-			args = [ "/dev/ttyAMA0", baudrate ]
+			args = [ "/dev/ttyS0", baudrate ]
 		elif len(args) == 1:
 			args = [ args[0], baudrate ]
 		else:
@@ -167,19 +173,19 @@ class Adafruit_Thermal(Serial):
 
 	# 'Raw' byte-writing method
 	def writeBytes(self, *args):
-		self.timeoutWait()
-		self.timeoutSet(len(args) * self.byteTime)
 		for arg in args:
-			super(Adafruit_Thermal, self).write(chr(arg))
+			self.timeoutWait()
+			self.timeoutSet(self.byteTime)
+			super(Adafruit_Thermal, self).write(bytes([arg]))
 
 
 	# Override write() method to keep track of paper feed.
 	def write(self, *data):
-		for i in range(len(data)):
-			c = data[i]
-			if c != 0x13:
+		for i in range(len(data[0])):
+			c = data[0][i]
+			if ord(c) != 0x13:
 				self.timeoutWait()
-				super(Adafruit_Thermal, self).write(c)
+				super(Adafruit_Thermal, self).write(c.encode('cp437','ignore'))
 				d = self.byteTime
 				if ((c == '\n') or
 				    (self.column == self.maxColumn)):
