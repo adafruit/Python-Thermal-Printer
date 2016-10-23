@@ -36,6 +36,7 @@
 from __future__ import print_function
 from serial import Serial
 import time
+import math
 
 class Adafruit_Thermal(Serial):
 
@@ -267,7 +268,7 @@ class Adafruit_Thermal(Serial):
 		# Print string
 		self.timeoutWait()
 		self.timeoutSet((self.barcodeHeight + 40) * self.dotPrintTime)
-		super(Adafruit_Thermal, self).write(text)
+		super(Adafruit_Thermal, self).write(text.encode('utf-8', 'ignore'))
 		self.prevByte = '\n'
 		self.feed(2)
 
@@ -417,7 +418,7 @@ class Adafruit_Thermal(Serial):
 
 
 	def printBitmap(self, w, h, bitmap, LaaT=False):
-		rowBytes = (w + 7) / 8  # Round up to next byte boundary
+		rowBytes = math.floor((w + 7) / 8)  # Round up to next byte boundary
 		if rowBytes >= 48:
 			rowBytesClipped = 48  # 384 pixels max width
 		else:
@@ -444,7 +445,7 @@ class Adafruit_Thermal(Serial):
 			for y in range(chunkHeight):
 				for x in range(rowBytesClipped):
 					super(Adafruit_Thermal, self).write(
-					  chr(bitmap[i]))
+					  bytes([bitmap[i]]))
 					i += 1
 				i += rowBytes - rowBytesClipped
 			self.timeoutSet(chunkHeight * self.dotPrintTime)
