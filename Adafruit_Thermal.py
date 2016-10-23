@@ -32,12 +32,6 @@
 # - Trap errors properly.  Some stuff just falls through right now.
 # - Add docstrings throughout!
 
-#===============================================================================
-# Modification by Dennis Jung
-#
-# - Make module usable for Python3 and Raspberry Pi 3
-#===============================================================================
-
 # Python 2.X code using the library usu. needs to include the next line:
 from __future__ import print_function
 from serial import Serial
