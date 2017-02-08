@@ -32,7 +32,7 @@ data = json.loads(response.read())
 temperature = int(data['currently']['temperature'])
 humidity    = int(data['currently']['humidity'] * 100);
 windSpeed   = int(data['currently']['windSpeed'])
-windDir     = str(data['currently']['windBearing'])
+windDir     = data['currently']['windBearing']
 windUnits   = "mph"
 
 # print(temperature)
