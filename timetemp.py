@@ -17,7 +17,7 @@ from __future__ import print_function
 from Adafruit_Thermal import *
 import Image, ImageDraw, time, urllib, json
 
-# API_KEY = "YOUR_API_KEY"
+API_KEY = "YOUR_API_KEY"
 
 LAT = "40.726019"
 LONG = "-74.00536"

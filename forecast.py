@@ -20,7 +20,7 @@ from datetime import datetime
 import calendar
 import urllib, json
 
-# API_KEY = "YOUR_API_KEY"
+API_KEY = "YOUR_API_KEY"
 
 LAT = "40.726019"
 LONG = "-74.00536"
