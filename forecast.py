@@ -38,7 +38,7 @@ def forecast(idx):
     printer.print(deg)
     printer.print(' high ' + str(hi))
     printer.print(deg)
-    printer.println(' ' + cond.replace(u'\u2013', '-').encode('utf-8')) # take care of pesky unicode dash "–" or \u2013
+    printer.println(' ' + cond.replace(u'\u2013', '-').encode('utf-8')) # take care of pesky unicode dash
 
 printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 deg     = chr(0xf8) # Degree symbol on thermal printer
