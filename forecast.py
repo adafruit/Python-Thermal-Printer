@@ -40,7 +40,7 @@ def forecast(idx):
     printer.print(deg)
     printer.println(' ' + cond.replace(u'\u2013', '-').encode('utf-8')) # take care of pesky unicode dash "–" or \u2013
 
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 deg     = chr(0xf8) # Degree symbol on thermal printer
 
 url = "https://api.darksky.net/forecast/"+API_KEY+"/"+LAT+","+LONG+"?exclude=[alerts,minutely,hourly,flags]&units=us"

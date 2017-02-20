@@ -164,6 +164,6 @@ if windUnits == 'kph': img.paste(Kph, (x, y))
 else:                  img.paste(Mph, (x, y))
 
 # Open connection to printer and print image
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 printer.printImage(img, True)
 printer.feed(3)
