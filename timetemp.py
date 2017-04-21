@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Current time and temperature display for Raspberry Pi w/Adafruit Mini
-# Thermal Printer.  Retrieves data from Yahoo! weather, prints current
+# Thermal Printer.  Retrieves data from DarkSky.net's API, prints current
 # conditions and time using large, friendly graphics.
 # See forecast.py for a different weather example that's all text-based.
 # Written by Adafruit Industries.  MIT license.
@@ -15,31 +15,31 @@
 
 from __future__ import print_function
 from Adafruit_Thermal import *
-from xml.dom.minidom import parseString
-import Image, ImageDraw, time, urllib
+import Image, ImageDraw, time, urllib, json
 
-# WOEID indicates the geographic location for the forecast.  It is
-# not a ZIP code or other common indicator.  Instead, it can be found
-# by 'manually' visiting http://weather.yahoo.com, entering a location
-# and requesting a forecast, then copy the number from the end of the
-# current URL string and paste it here.
-WOEID = '2459115'
+API_KEY = "YOUR_API_KEY"
 
-# Fetch weather data from Yahoo!, parse resulting XML
-dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+LAT = "40.726019"
+LONG = "-74.00536"
+
+# Fetch weather data from DarkSky, parse resulting JSON
+url = "https://api.darksky.net/forecast/"+API_KEY+"/"+LAT+","+LONG+"?exclude=[alerts,minutely,hourly,flags]&units=us"
+response = urllib.urlopen(url)
+data = json.loads(response.read())
 
 # Extract values relating to current temperature, humidity, wind
-temperature = int(dom.getElementsByTagName(
-                'yweather:condition')[0].getAttribute('temp'))
-humidity    = int(dom.getElementsByTagName(
-                'yweather:atmosphere')[0].getAttribute('humidity'))
-windSpeed   = int(dom.getElementsByTagName(
-                'yweather:wind')[0].getAttribute('speed'))
-windDir     = int(dom.getElementsByTagName(
-                'yweather:wind')[0].getAttribute('direction'))
-windUnits   = dom.getElementsByTagName(
-                'yweather:units')[0].getAttribute('speed')
+
+temperature = int(data['currently']['temperature'])
+humidity    = int(data['currently']['humidity'] * 100);
+windSpeed   = int(data['currently']['windSpeed'])
+windDir     = data['currently']['windBearing']
+windUnits   = "mph"
+
+# print(temperature)
+# print(humidity)   
+# print(windSpeed)  
+# print(windDir)    
+# print(windUnits)  
 
 # Although the Python Imaging Library does have nice font support,
 # I opted here to use a raster bitmap for all of the glyphs instead.
@@ -62,11 +62,11 @@ DirAngle       = [  23,  68, 113, 157, 203, 247, 293, 336 ]
 
 # Generate a list of sub-image glyphs cropped from the symbols image
 def croplist(widths, x, y, height):
-	list = []
-	for i in range(len(widths)):
-		list.append(symbols.crop(
-		  [x, y+i*height, x+widths[i], y+(i+1)*height]))
-	return list
+    list = []
+    for i in range(len(widths)):
+        list.append(symbols.crop(
+          [x, y+i*height, x+widths[i], y+(i+1)*height]))
+    return list
 
 # Crop glyph lists (digits, days of week, etc.)
 TimeDigit = croplist(TimeDigitWidth,   0,   0, 44)
@@ -91,20 +91,20 @@ y = 12
 
 # Paste a series of glyphs (mostly numbers) from string to img
 def drawNums(str, x, y, list):
-	for i in range(len(str)):
-		d = ord(str[i]) - ord('0')
-		img.paste(list[d], (x, y))
-		x += list[d].size[0] + 1
-	return x
+    for i in range(len(str)):
+        d = ord(str[i]) - ord('0')
+        img.paste(list[d], (x, y))
+        x += list[d].size[0] + 1
+    return x
 
 # Determine total width of a series of glyphs in string
 def numWidth(str, list):
-	w = 0 # Cumulative width
-	for i in range(len(str)):
-		d = ord(str[i]) - ord('0')
-		if i > 0: w += 1     # Space between digits
-		w += list[d].size[0] # Digit width
-	return w
+    w = 0 # Cumulative width
+    for i in range(len(str)):
+        d = ord(str[i]) - ord('0')
+        if i > 0: w += 1     # Space between digits
+        w += list[d].size[0] # Digit width
+    return w
 
 # Render current time (always 24 hour XX:XX format)
 t = time.localtime()
@@ -134,12 +134,13 @@ s  = str(humidity) + ':' # Appends percent glyph
 s2 = str(windSpeed)
 winDirNum = 0  # Wind direction glyph number
 if windSpeed > 0:
-	for winDirNum in range(len(DirAngle) - 1):
-		if windDir < DirAngle[winDirNum]: break
+    for winDirNum in range(len(DirAngle) - 1):
+        if windDir < DirAngle[winDirNum]: break
+winDirNum+=1      
 w  = Humidity.size[0] + 5 + numWidth(s, HumiDigit)
 w2 = Wind.size[0] + 5 + numWidth(s2, HumiDigit)
 if windSpeed > 0:
-	w2 += 3 + Dir[winDirNum].size[0]
+    w2 += 3 + Dir[winDirNum].size[0]
 if windUnits == 'kph': w2 += 3 + Kph.size[0]
 else:                  w2 += 3 + Mph.size[0]
 if w2 > w: w = w2
@@ -154,14 +155,15 @@ x = img.size[0] - w # Left-align again
 y += 23             # And advance to next line
 img.paste(Wind, (x, y))
 x += Wind.size[0] + 5
+
 if windSpeed > 0:
-	img.paste(Dir[winDirNum], (x, y))
-	x += Dir[winDirNum].size[0] + 3
+    img.paste(Dir[winDirNum], (x, y))
+    x += Dir[winDirNum].size[0] + 3
 x = drawNums(s2, x, y, HumiDigit) + 3
 if windUnits == 'kph': img.paste(Kph, (x, y))
 else:                  img.paste(Mph, (x, y))
 
 # Open connection to printer and print image
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 printer.printImage(img, True)
 printer.feed(3)

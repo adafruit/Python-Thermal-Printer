@@ -47,7 +47,7 @@ queryString = 'from:Adafruit'
 
 # Other globals.  You probably won't need to change these. -----------------
 
-printer   = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+printer   = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 host      = 'api.twitter.com'
 authUrl   = '/oauth2/token'
 searchUrl = '/1.1/search/tweets.json?'
