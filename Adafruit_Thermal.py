@@ -36,6 +36,7 @@
 from __future__ import print_function
 from serial import Serial
 import time
+import math
 
 class Adafruit_Thermal(Serial):
 
@@ -58,7 +59,7 @@ class Adafruit_Thermal(Serial):
 		# If both passed, use those values.
 		baudrate = 19200
 		if len(args) == 0:
-			args = [ "/dev/serial0", baudrate ]
+			args = [ "/dev/ttyS0", baudrate ]
 		elif len(args) == 1:
 			args = [ args[0], baudrate ]
 		else:
@@ -167,19 +168,19 @@ class Adafruit_Thermal(Serial):
 
 	# 'Raw' byte-writing method
 	def writeBytes(self, *args):
-		self.timeoutWait()
-		self.timeoutSet(len(args) * self.byteTime)
 		for arg in args:
-			super(Adafruit_Thermal, self).write(chr(arg))
+			self.timeoutWait()
+			self.timeoutSet(self.byteTime)
+			super(Adafruit_Thermal, self).write(bytes([arg]))
 
 
 	# Override write() method to keep track of paper feed.
 	def write(self, *data):
-		for i in range(len(data)):
-			c = data[i]
-			if c != 0x13:
+		for i in range(len(data[0])):
+			c = data[0][i]
+			if ord(c) != 0x13:
 				self.timeoutWait()
-				super(Adafruit_Thermal, self).write(c)
+				super(Adafruit_Thermal, self).write(c.encode('cp437','ignore'))
 				d = self.byteTime
 				if ((c == '\n') or
 				    (self.column == self.maxColumn)):
@@ -267,7 +268,7 @@ class Adafruit_Thermal(Serial):
 		# Print string
 		self.timeoutWait()
 		self.timeoutSet((self.barcodeHeight + 40) * self.dotPrintTime)
-		super(Adafruit_Thermal, self).write(text)
+		super(Adafruit_Thermal, self).write(text.encode('utf-8', 'ignore'))
 		self.prevByte = '\n'
 		self.feed(2)
 
@@ -417,7 +418,7 @@ class Adafruit_Thermal(Serial):
 
 
 	def printBitmap(self, w, h, bitmap, LaaT=False):
-		rowBytes = (w + 7) / 8  # Round up to next byte boundary
+		rowBytes = math.floor((w + 7) / 8)  # Round up to next byte boundary
 		if rowBytes >= 48:
 			rowBytesClipped = 48  # 384 pixels max width
 		else:
@@ -444,7 +445,7 @@ class Adafruit_Thermal(Serial):
 			for y in range(chunkHeight):
 				for x in range(rowBytesClipped):
 					super(Adafruit_Thermal, self).write(
-					  chr(bitmap[i]))
+					  bytes([bitmap[i]]))
 					i += 1
 				i += rowBytes - rowBytesClipped
 			self.timeoutSet(chunkHeight * self.dotPrintTime)
