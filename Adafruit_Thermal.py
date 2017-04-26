@@ -348,7 +348,7 @@ class Adafruit_Thermal(Serial):
 				super(Adafruit_Thermal, self).write(chr(n))
 				for i in range(n):
 					super(Adafruit_Thermal,
-					  self).write(text[n])
+					  self).write(text[i])
 		else:
 			# Older firmware: write string + NUL
 			if self.writeToStdout:

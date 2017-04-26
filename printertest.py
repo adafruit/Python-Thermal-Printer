@@ -61,7 +61,7 @@ printer.printBitmap(adalogo.width, adalogo.height, adalogo.data)
 import gfx.adaqrcode as adaqrcode
 printer.printBitmap(adaqrcode.width, adaqrcode.height, adaqrcode.data)
 printer.println("Adafruit!")
-printer.feed(1)
+printer.feed(2)
 
 printer.sleep()      # Tell printer to sleep
 printer.wake()       # Call wake() before printing again, even if reset
