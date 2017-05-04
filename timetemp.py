@@ -15,7 +15,8 @@
 
 from __future__ import print_function
 from Adafruit_Thermal import *
-import Image, ImageDraw, time, urllib, json
+import time, urllib, json
+from PIL import Image, ImageDraw
 
 API_KEY = "YOUR_API_KEY"
 
