@@ -35,7 +35,7 @@ def readme():
         return f.read()
 
 setup(name='Adafruit_Thermal',
-      version='1.0.0',
+      version='1.1.0',
       description='Library for controlling Adafruit Thermal Printers',
       url='https://github.com/bareo/Python-Thermal-Printer',
       author='zach wick',

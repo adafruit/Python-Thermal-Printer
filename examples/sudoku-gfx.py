@@ -23,9 +23,9 @@
 from __future__ import print_function
 import sys, os, random, getopt, re
 from Adafruit_Thermal import *
-import Image
+from PIL import Image
 
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 bg      = Image.new("1", [384, 426], "white") # Working 'background' image
 img     = Image.open('gfx/sudoku.png')        # Source bitmaps
 xcoord  = [ 15, 55,  95,  139, 179, 219,  263, 303, 343 ]

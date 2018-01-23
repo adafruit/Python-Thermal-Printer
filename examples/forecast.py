@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Weather forecast for Raspberry Pi w/Adafruit Mini Thermal Printer.
-# Retrieves data from Yahoo! weather, prints current conditions and
+# Retrieves data from DarkSky.net's API, prints current conditions and
 # forecasts for next two days.  See timetemp.py for a different
 # weather example using nice bitmaps.
 # Written by Adafruit Industries.  MIT license.
@@ -14,51 +14,52 @@
 # http://www.adafruit.com/products/600 Printer starter pack
 
 from __future__ import print_function
-import urllib, time
 from Adafruit_Thermal import *
-from xml.dom.minidom import parseString
+from datetime import date
+from datetime import datetime
+import calendar
+import urllib, json
 
-# WOEID indicates the geographic location for the forecast.  It is
-# not a ZIP code or other common indicator.  Instead, it can be found
-# by 'manually' visiting http://weather.yahoo.com, entering a location
-# and requesting a forecast, then copy the number from the end of the
-# current URL string and paste it here.
-WOEID = '2459115'
+API_KEY = "YOUR_API_KEY"
+
+LAT = "40.726019"
+LONG = "-74.00536"
 
 # Dumps one forecast line to the printer
 def forecast(idx):
-	tag     = 'yweather:forecast'
-	day     = dom.getElementsByTagName(tag)[idx].getAttribute('day')
-	lo      = dom.getElementsByTagName(tag)[idx].getAttribute('low')
-	hi      = dom.getElementsByTagName(tag)[idx].getAttribute('high')
-	cond    = dom.getElementsByTagName(tag)[idx].getAttribute('text')
-	printer.print(day + ': low ' + lo )
-	printer.print(deg)
-	printer.print(' high ' + hi)
-	printer.print(deg)
-	printer.println(' ' + cond)
 
-printer = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
+    date = datetime.fromtimestamp(int(data['daily']['data'][idx]['time']))
+
+    day     = calendar.day_name[date.weekday()]
+    lo      = data['daily']['data'][idx]['temperatureMin']
+    hi      = data['daily']['data'][idx]['temperatureMax']
+    cond    = data['daily']['data'][idx]['summary']
+    printer.print(day + ': low ' + str(lo) )
+    printer.print(deg)
+    printer.print(' high ' + str(hi))
+    printer.print(deg)
+    printer.println(' ' + cond.replace(u'\u2013', '-').encode('utf-8')) # take care of pesky unicode dash
+
+printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 deg     = chr(0xf8) # Degree symbol on thermal printer
 
-# Fetch forecast data from Yahoo!, parse resulting XML
-dom = parseString(urllib.urlopen(
-        'http://weather.yahooapis.com/forecastrss?w=' + WOEID).read())
+url = "https://api.darksky.net/forecast/"+API_KEY+"/"+LAT+","+LONG+"?exclude=[alerts,minutely,hourly,flags]&units=us"
+response = urllib.urlopen(url)
+data = json.loads(response.read())
 
 # Print heading
 printer.inverseOn()
-printer.print('{:^32}'.format(
-  dom.getElementsByTagName('description')[0].firstChild.data))
+printer.print('{:^32}'.format("DarkSky.Net Forecast"))
 printer.inverseOff()
 
 # Print current conditions
 printer.boldOn()
 printer.print('{:^32}'.format('Current conditions:'))
 printer.boldOff()
-printer.print('{:^32}'.format(
-  dom.getElementsByTagName('pubDate')[0].firstChild.data))
-temp = dom.getElementsByTagName('yweather:condition')[0].getAttribute('temp')
-cond = dom.getElementsByTagName('yweather:condition')[0].getAttribute('text')
+
+
+temp = data['currently']['temperature']
+cond = data['currently']['summary']
 printer.print(temp)
 printer.print(deg)
 printer.println(' ' + cond)
