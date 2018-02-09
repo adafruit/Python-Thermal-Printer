@@ -59,6 +59,9 @@ class Adafruit_Thermal(Serial):
 		# NEW BEHAVIOR: if no parameters given, output is written
 		# to stdout, to be piped through 'lp -o raw' (old behavior
 		# was to use default port & baud rate).
+		self.dtrEnabled = False
+		self.dtrPin = None
+
 		baudrate = 19200
 		if len(args) == 0:
 			self.writeToStdout = True
@@ -68,6 +71,10 @@ class Adafruit_Thermal(Serial):
 		elif len(args) == 2:
 			# If both passed, use those values.
 			baudrate = args[1]
+
+		elif len(args) == 3:
+			self.dtrPin = args[2]
+			args = [args[0], args[1]]
 
 		# Firmware is assumed version 2.68.  Can override this
 		# with the 'firmware=X' argument, where X is the major
@@ -134,6 +141,19 @@ class Adafruit_Thermal(Serial):
 			  18, # DC2
 			  35, # Print density
 			  (printBreakTime << 5) | printDensity)
+
+			# Enable DTR pin if requested
+			if(self.dtrPin):
+				try:
+					import RPi.GPIO as GPIO
+				except RuntimeError:
+					print('Must run on Raspberry Pi for DTR Handshake')
+				GPIO.setmode(GPIO.BCM)
+				GPIO.setup(self.dtrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+				self.writeBytes(29, 0x61, (1 << 5))
+				self.dtrEnabled = True
+				print('Printer DTR Handshake Enabled')
+
 			self.dotPrintTime = 0.03
 			self.dotFeedTime  = 0.0021
 		else:
@@ -153,12 +173,16 @@ class Adafruit_Thermal(Serial):
 
 	# Sets estimated completion time for a just-issued task.
 	def timeoutSet(self, x):
-		self.resumeTime = time.time() + x
+		if not self.dtrEnabled:
+			self.resumeTime = time.time() + x
 
 	# Waits (if necessary) for the prior task to complete.
 	def timeoutWait(self):
 		if self.writeToStdout is False:
-			while (time.time() - self.resumeTime) < 0: pass
+			if self.dtrEnabled:
+				while (GPIO.input(self.dtrPin) == GPIO.HIGH): pass
+			else:
+				while (time.time() - self.resumeTime) < 0: pass
 
 	# Printer performance may vary based on the power supply voltage,
 	# thickness of paper, phase of the moon and other seemingly random
