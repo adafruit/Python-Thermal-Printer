@@ -38,6 +38,20 @@ from serial import Serial
 import time
 import sys
 
+try:
+	import RPi.GPIO as GPIO
+except:
+	print('Must run on Raspberry Pi for DTR Handshake')
+
+ASCII_TAB = '\t' # Horizontal tab
+ASCII_LF  = '\n' # Line feed
+ASCII_FF  = '\f' # Form feed
+ASCII_CR  = '\r' # Carriage return
+ASCII_DC2 = 18  # Device control 2
+ASCII_ESC = 27  # Escape
+ASCII_FS  = 28  # Field separator
+ASCII_GS  = 29  # Group separator
+
 class Adafruit_Thermal(Serial):
 
 	resumeTime      =   0.0
@@ -144,13 +158,9 @@ class Adafruit_Thermal(Serial):
 
 			# Enable DTR pin if requested
 			if(self.dtrPin):
-				try:
-					import RPi.GPIO as GPIO
-				except RuntimeError:
-					print('Must run on Raspberry Pi for DTR Handshake')
 				GPIO.setmode(GPIO.BCM)
 				GPIO.setup(self.dtrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-				self.writeBytes(29, 0x61, (1 << 5))
+				self.writeBytes(29, 97, (1 << 5))
 				self.dtrEnabled = True
 				print('Printer DTR Handshake Enabled')
 
@@ -208,9 +218,9 @@ class Adafruit_Thermal(Serial):
 				sys.stdout.write(chr(arg))
 		else:
 			self.timeoutWait()
-			self.timeoutSet(len(args) * self.byteTime)
 			for arg in args:
 				super(Adafruit_Thermal, self).write(chr(arg))
+			self.timeoutSet(len(args) * self.byteTime)
 
 	# Override write() method to keep track of paper feed.
 	def write(self, *data):
@@ -358,7 +368,6 @@ class Adafruit_Thermal(Serial):
 		  29, 119, 3, # Barcode width
 		  29, 107, n) # Barcode type
 		self.timeoutWait()
-		self.timeoutSet((self.barcodeHeight + 40) * self.dotPrintTime)
 		# Print string
 		if self.firmwareVersion >= 264:
 			# Recent firmware: write length byte + string sans NUL
@@ -369,16 +378,17 @@ class Adafruit_Thermal(Serial):
 				for i in range(n):
 					sys.stdout.write(text[i])
 			else:
-				super(Adafruit_Thermal, self).write(chr(n))
+				self.writeBytes(n)
 				for i in range(n):
-					super(Adafruit_Thermal,
-					  self).write(text[i])
+					self.writeBytes(ord(text[i]))
 		else:
 			# Older firmware: write string + NUL
 			if self.writeToStdout:
 				sys.stdout.write(text)
 			else:
 				super(Adafruit_Thermal, self).write(text)
+
+		self.timeoutSet((self.barcodeHeight + 40) * self.dotPrintTime)
 		self.prevByte = '\n'
 
 	# === Character commands ===
@@ -471,7 +481,7 @@ class Adafruit_Thermal(Serial):
 			pos = 2
 		else:
 			pos = 0
-		self.writeBytes(0x1B, 0x61, pos)
+		self.writeBytes(27, 97, pos)
 
 	# Feeds by the specified number of lines
 	def feed(self, x=1):
@@ -558,8 +568,7 @@ class Adafruit_Thermal(Serial):
 						sys.stdout.write(
 						  chr(bitmap[i]))
 					else:
-						super(Adafruit_Thermal,
-						  self).write(chr(bitmap[i]))
+						self.writeBytes(bitmap[i])
 					i += 1
 				i += rowBytes - rowBytesClipped
 			self.timeoutSet(chunkHeight * self.dotPrintTime)
