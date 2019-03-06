@@ -39,7 +39,7 @@ consumer_key    = 'PUT_YOUR_CONSUMER_KEY_HERE'
 consumer_secret = 'PUT_YOUR_CONSUMER_SECRET_HERE'
 
 # queryString can be any valid Twitter API search string, including
-# boolean operators.  See http://dev.twitter.com/docs/using-search
+# boolean operators.  See https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
 # for options and syntax.  Funny characters do NOT need to be URL
 # encoded here -- urllib takes care of that.
 queryString = 'from:Adafruit'
