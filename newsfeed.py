@@ -43,13 +43,13 @@ consumer_secret = 'PUT_YOUR_CONSUMER_SECRET_HERE'
 # for options and syntax.  Funny characters do NOT need to be URL
 # encoded here -- urllib takes care of that.
 #queryString = 'from:Adafruit'
-queryString = '@gastonwnc OR (from:WRAL AND new%32story) OR (from:WRAL AND %23breaking) OR from:indyweek'
+queryString = 'from:WRAL OR from:ABC11_WTVD'
 
 
 # Other globals.  You probably won't need to change these. -----------------
 
 printer   = Adafruit_Thermal("/dev/ttyAMA0", 19200, timeout=5)
-host      = 'api.twitter.com'
+host      = 'api.twittercom'
 authUrl   = '/oauth2/token'
 searchUrl = '/1.1/search/tweets.json?'
 agent     = 'Gutenbird v1.0'
@@ -59,30 +59,14 @@ else:                 lastId = '1'
 
 # Initiate an HTTPS connection/request, uncompress and JSON-decode results
 def issueRequestAndDecodeResponse(method, url, body, headers):
-  # grw - May 15, 2015
-  # Added try block to return the lastid 
-  # value when conection throws an exception.  
-  # This will prevent repeated printing of last
-  #  set of tweets when Twitter refuses the connection.
-  try:
-    connection = httplib.HTTPSConnection(host)
-    connection.request(method, url, body, headers)
-    response = connection.getresponse()
-  except:
-    # printer.println('--Connection Error--')  # debugging 
-    # printer.println(lastId) # debugging
-    print(lastId) #Piped back to calling process
-    exit(0)
-   
-
+  connection = httplib.HTTPSConnection(host)
+  connection.request(method, url, body, headers)
+  response = connection.getresponse()
   if response.status != 200:
     # This is OK for command-line testing, otherwise
     # keep it commented out when using main.py
     # print('HTTP error: %d' % response.status)
-    # exit(-1)
-    print(lastId) #Piped back to calling process
-    exit(0)
-
+    exit(-1)
   compressed = response.read()
   connection.close()
   return json.loads(zlib.decompress(compressed, 16+zlib.MAX_WBITS))

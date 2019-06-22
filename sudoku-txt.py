@@ -32,6 +32,7 @@ def main():
   else:
     puzzles = [makepuzzle(solution([None] * 81))]
   for puzzle in puzzles:
+    writeboard(puzzle, "puzzle.txt")
     printer.println("PUZZLE:")
     printer.feed(1)
     printer.print(printboard(puzzle))
@@ -298,6 +299,25 @@ def printboard(board):
 #      out += printcode(board[posfor(row, col)])
 #    out += ('\n','\n','\n\n','\n','\n','\n\n','\n','\n','\n')[row]
   return out
+
+def printcode(n):
+  if n is None: return '_'
+  return str(n+1)
+
+def writeboard(board, filename):
+# Original output code:
+  out = ""
+  for row in xrange(9):
+    for col in xrange(9):
+      out += (""," "," ","  "," "," ","  "," "," ")[col]
+      out += printcode(board[posfor(row, col)])
+    out += ('\n','\n','\n\n','\n','\n','\n\n','\n','\n','\n')[row]
+  # print(out)
+  f = open(filename, "w")
+  result = f.write(out)
+  f.close()
+  return result
+
 
 def parseboard(str):
   result = []

@@ -40,17 +40,44 @@ def main():
   if len(args) > 0:
     puzzles = [loadboard(filename) for filename in args]
   else:
-    puzzles = [makepuzzle(solution([None] * 81))]
+    enigma = makepuzzle(solution([None] * 81))
+    difficulty = ratepuzzle(enigma, 4)
+    count = 1
+    # make dificult puzzles rare
+    while difficulty > 1.75 and count < 3 :
+      enigma = makepuzzle(solution([None] * 81))
+      difficulty = ratepuzzle(enigma, 4)
+      count += 1
+    puzzles = [enigma]
+
   for puzzle in puzzles:
-    printboard(puzzle)           # Doesn't print, just modifies 'bg' image
-    printer.printImage(bg, True) # This does the printing
-    printer.println("RATING:", ratepuzzle(puzzle, 4))
     if len(args) > 0:
       printer.println()
-      printer.println("SOLUTION:")
       answer = solution(puzzle)
       if answer is None: printer.println("NO SOLUTION")
-      else: printer.print(printboard(answer))
+      else: 
+        printboard(answer)
+        printer.printImage(bg, True)  
+        printer.println()
+    else:
+      writeboard(puzzle, "puzzle.txt")           # write out to file
+      printboard(puzzle)           # Doesn't print, just modifies 'bg' image
+      printer.printImage(bg, True) # This does the printing
+      # printer.println("RATING:", ratepuzzle(puzzle, 4))
+      printer.print("Rating: ")
+      if difficulty < 1:
+        printer.print("Easy")
+      elif difficulty < 2:
+        printer.print("Medium")
+      elif difficulty < 3:
+        printer.print("Hard")
+      else:
+        printer.print("Expert")
+      #print the difficulty rating (0.0 to 3.75)
+      printer.print(" (")
+      printer.print(difficulty)
+      printer.print(")")
+         
   printer.feed(3)
 
 def makepuzzle(board):
@@ -211,6 +238,23 @@ def parseboard(str):
       if x in '123456789': result.append(int(x) - 1)
       else: result.append(None)
       if len(result) == 81: return result
+
+def printcode(n):
+  if n is None: return '_'
+  return str(n+1)
+
+def writeboard(board, filename):
+  out = ""
+  for row in xrange(9):
+    for col in xrange(9):
+      out += (""," "," ","  "," "," ","  "," "," ")[col]
+      out += printcode(board[posfor(row, col)])
+    out += ('\n','\n','\n\n','\n','\n','\n\n','\n','\n','\n')[row]
+  # print(out)
+  f = open(filename, "w")
+  result = f.write(out)
+  f.close()
+  return result
 
 def loadboard(filename):
   f = file(filename, 'r')
