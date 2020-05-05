@@ -32,11 +32,10 @@
 # - Trap errors properly.  Some stuff just falls through right now.
 # - Add docstrings throughout!
 
-# Python 2.X code using the library usu. needs to include the next line:
-from __future__ import print_function
 from serial import Serial
 import time
 import sys
+import math
 
 class Adafruit_Thermal(Serial):
 
@@ -181,12 +180,12 @@ class Adafruit_Thermal(Serial):
 	def writeBytes(self, *args):
 		if self.writeToStdout:
 			for arg in args:
-				sys.stdout.write(chr(arg))
+				sys.stdout.write(bytes([arg]))
 		else:
-			self.timeoutWait()
-			self.timeoutSet(len(args) * self.byteTime)
 			for arg in args:
-				super(Adafruit_Thermal, self).write(chr(arg))
+				self.timeoutWait()
+				self.timeoutSet(len(args) * self.byteTime)
+				super(Adafruit_Thermal, self).write(bytes([arg]))
 
 	# Override write() method to keep track of paper feed.
 	def write(self, *data):
@@ -262,7 +261,7 @@ class Adafruit_Thermal(Serial):
 		self.setCodePage()
 
 	def test(self):
-		self.write("Hello world!")
+		self.write("Hello world!".encode('cp437', 'ignore'))
 		self.feed(2)
 
 	def testPage(self):
@@ -341,20 +340,20 @@ class Adafruit_Thermal(Serial):
 			n = len(text)
 			if n > 255: n = 255
 			if self.writeToStdout:
-				sys.stdout.write(chr(n))
+				sys.stdout.write((chr(n)).encode('cp437', 'ignore'))
 				for i in range(n):
-					sys.stdout.write(text[i])
+					sys.stdout.write(text[i].encode('utf-8', 'ignore'))
 			else:
-				super(Adafruit_Thermal, self).write(chr(n))
+				super(Adafruit_Thermal, self).write((chr(n)).encode('utf-8', 'ignore'))
 				for i in range(n):
 					super(Adafruit_Thermal,
-					  self).write(text[i])
+					  self).write(text[i].encode('utf-8', 'ignore'))
 		else:
 			# Older firmware: write string + NUL
 			if self.writeToStdout:
-				sys.stdout.write(text)
+				sys.stdout.write(text.encode('utf-8', 'ignore'))
 			else:
-				super(Adafruit_Thermal, self).write(text)
+				super(Adafruit_Thermal, self).write(text.encode('utf-8', 'ignore'))
 		self.prevByte = '\n'
 
 	# === Character commands ===
@@ -461,7 +460,7 @@ class Adafruit_Thermal(Serial):
 			# datasheet claims sending bytes 27, 100, <x> works,
 			# but it feeds much more than that.  So, manually:
 			while x > 0:
-				self.write('\n')
+				self.write('\n'.encode('cp437', 'ignore'))
 				x -= 1
 
 	# Feeds by the specified number of individual pixel rows
@@ -504,7 +503,7 @@ class Adafruit_Thermal(Serial):
 		self.writeBytes(27, 45, 0)
 
 	def printBitmap(self, w, h, bitmap, LaaT=False):
-		rowBytes = (w + 7) / 8  # Round up to next byte boundary
+		rowBytes = math.floor((w + 7) / 8)  # Round up to next byte boundary
 		if rowBytes >= 48:
 			rowBytesClipped = 48  # 384 pixels max width
 		else:
@@ -531,11 +530,10 @@ class Adafruit_Thermal(Serial):
 			for y in range(chunkHeight):
 				for x in range(rowBytesClipped):
 					if self.writeToStdout:
-						sys.stdout.write(
-						  chr(bitmap[i]))
+						sys.stdout.write(bytes([bitmap[i]]))
 					else:
 						super(Adafruit_Thermal,
-						  self).write(chr(bitmap[i]))
+						  self).write(bytes([bitmap[i]]))
 					i += 1
 				i += rowBytes - rowBytesClipped
 			self.timeoutSet(chunkHeight * self.dotPrintTime)
@@ -549,9 +547,9 @@ class Adafruit_Thermal(Serial):
 	# For any other behavior (scale, B&W threshold, etc.), use
 	# the Imaging Library to perform such operations before
 	# passing the result to this function.
-	def printImage(self, image, LaaT=False):
+	def printImage(self, image_file, LaaT=False):
 		from PIL import Image
-
+		image = Image.open(image_file)
 		if image.mode != '1':
 			image = image.convert('1')
 
@@ -559,7 +557,7 @@ class Adafruit_Thermal(Serial):
 		height = image.size[1]
 		if width > 384:
 			width = 384
-		rowBytes = (width + 7) / 8
+		rowBytes = math.floor((width + 7) / 8)
 		bitmap   = bytearray(rowBytes * height)
 		pixels   = image.load()
 
@@ -726,11 +724,11 @@ class Adafruit_Thermal(Serial):
 	# with existing code written for the Arduino library.
 	def print(self, *args, **kwargs):
 		for arg in args:
-			self.write(str(arg))
+			self.write((str(arg)).encode('cp437', 'ignore'))
 
 	# For Arduino code compatibility again
 	def println(self, *args, **kwargs):
 		for arg in args:
-			self.write(str(arg))
-		self.write('\n')
+			self.write((str(arg)).encode('cp437', 'ignore'))
+		self.write('\n'.encode('cp437', 'ignore'))
 
