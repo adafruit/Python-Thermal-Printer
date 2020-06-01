@@ -2,7 +2,7 @@
 
 from Adafruit_Thermal import *
 
-printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
+printer = Adafruit_Thermal("/dev/ttyUSB0", 9600, timeout=5)
 
 # Test inverse on & off
 printer.inverseOn()
@@ -27,9 +27,29 @@ printer.boldOn()
 printer.println("Bold text")
 printer.boldOff()
 
-printer.underlineOn()
+printer.underlineOn(1)
 printer.println("Underlined text")
 printer.underlineOff()
+
+printer.underlineOn(2)
+printer.println("Thick underlined text")
+printer.underlineOff()
+
+printer.upsideDownOn()
+printer.println("Upside down text")
+printer.upsideDownOff()
+
+printer.doubleHeightOn()
+printer.println("Double height text")
+printer.doubleHeightOff()
+
+printer.doubleWidthOn()
+printer.println("Double width")
+printer.doubleWidthOff()
+
+printer.strikeOn()
+printer.println("Strikethrough text")
+printer.strikeOff()
 
 printer.setSize('L')   # Set type size, accepts 'S', 'M', 'L'
 printer.println("Large")
@@ -44,6 +64,10 @@ printer.setLineHeight(50)
 printer.println("Taller\nline\nspacing")
 printer.setLineHeight() # Reset to default
 printer.justify('L')
+
+hasPaper = str(printer.hasPaper())
+print("Does the printer have paper? " + hasPaper)
+printer.println("Does the printer have paper? " + hasPaper)
 
 # Barcode examples
 printer.feed(1)

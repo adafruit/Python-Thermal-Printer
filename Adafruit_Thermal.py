@@ -58,7 +58,7 @@ class Adafruit_Thermal(Serial):
 		# NEW BEHAVIOR: if no parameters given, output is written
 		# to stdout, to be piped through 'lp -o raw' (old behavior
 		# was to use default port & baud rate).
-		baudrate = 19200
+		baudrate = 9600
 		if len(args) == 0:
 			self.writeToStdout = True
 		if len(args) == 1:
@@ -623,9 +623,13 @@ class Adafruit_Thermal(Serial):
 		else:
 			self.writeBytes(29, 114, 0)
 		# Bit 2 of response seems to be paper status
-		stat = ord(self.read(1)) & 0b00000100
-		# If set, we have paper; if clear, no paper
-		return stat == 0
+		result = self.read(1)
+		if len(result) > 0:
+			stat = ord(result) & 0b00000100
+			# If set, we have paper; if clear, no paper
+			return stat == 0
+		else:
+			return False
 
 	def setLineHeight(self, val=32):
 		if val < 24: val = 24
@@ -656,7 +660,7 @@ class Adafruit_Thermal(Serial):
 	CHARSET_CHINA        = 15
 
 	# Alters some chars in ASCII 0x23-0x7E range; see datasheet
-	def setCharset(self, val=0):
+	def setCharset(self, val=3):
 		if val > 15: val = 15
 		self.writeBytes(27, 82, val)
 
@@ -731,4 +735,3 @@ class Adafruit_Thermal(Serial):
 		for arg in args:
 			self.write((str(arg)).encode('cp437', 'ignore'))
 		self.write('\n'.encode('cp437', 'ignore'))
-
