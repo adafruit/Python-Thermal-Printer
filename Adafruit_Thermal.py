@@ -32,10 +32,12 @@
 # - Trap errors properly.  Some stuff just falls through right now.
 # - Add docstrings throughout!
 
+import textwrap
 from serial import Serial
 import time
 import sys
 import math
+
 
 class Adafruit_Thermal(Serial):
 
@@ -52,6 +54,7 @@ class Adafruit_Thermal(Serial):
 	printMode       =     0
 	defaultHeatTime =   120
 	firmwareVersion =   268
+	lineLength      =    32
 	writeToStdout   = False
 
 	def __init__(self, *args, **kwargs):
@@ -734,4 +737,10 @@ class Adafruit_Thermal(Serial):
 	def println(self, *args, **kwargs):
 		for arg in args:
 			self.write((str(arg)).encode('cp437', 'ignore'))
+		self.write('\n'.encode('cp437', 'ignore'))
+
+	def printlnWrap(self, *args, **kwargs):
+		for arg in args:
+			text = textwrap.fill(str(arg), self.maxColumn)
+			self.write((str(text)).encode('cp437', 'ignore'))
 		self.write('\n'.encode('cp437', 'ignore'))
