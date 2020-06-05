@@ -25,12 +25,12 @@ from Adafruit_Thermal import *
 
 printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 
-for i in range(0,256,15):
-	printer.begin(i)
-	printer.println(i)                 # Print heat time
-	printer.inverseOn()
-	printer.print('{:^32}'.format('')) # Print 32 spaces (inverted)
-	printer.inverseOff()
+for i in range(0, 256, 15):
+    printer.begin(i)
+    printer.println(i)                 # Print heat time
+    printer.inverseOn()
+    printer.print('{:^32}'.format(''))  # Print 32 spaces (inverted)
+    printer.inverseOff()
 
-printer.begin() # Reset heat time to default
+printer.begin()  # Reset heat time to default
 printer.feed(4)
