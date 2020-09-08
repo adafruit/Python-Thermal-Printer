@@ -15,32 +15,31 @@
 
 from __future__ import print_function
 from Adafruit_Thermal import *
-import time, urllib, json
+import time, urllib.request, json
 from PIL import Image, ImageDraw
 
-API_KEY = "YOUR_API_KEY"
+API_KEY = "YOUR_OPEN_WEATHER_API_KEY"
 
-LAT = "40.726019"
-LONG = "-74.00536"
+cityName = "YOUR_CITY_NAME"
 
 # Fetch weather data from DarkSky, parse resulting JSON
-url = "https://api.darksky.net/forecast/"+API_KEY+"/"+LAT+","+LONG+"?exclude=[alerts,minutely,hourly,flags]&units=us"
-response = urllib.urlopen(url)
+url = f"http://api.openweathermap.org/data/2.5/weather?q={cityName}&appid={API_KEY}"
+response = urllib.request.urlopen(url)
 data = json.loads(response.read())
-
+print(data)
 # Extract values relating to current temperature, humidity, wind
 
-temperature = int(data['currently']['temperature'])
-humidity    = int(data['currently']['humidity'] * 100);
-windSpeed   = int(data['currently']['windSpeed'])
-windDir     = data['currently']['windBearing']
+temperature = (int(data['main']['temp']) - 273.15) * 9/5 + 32
+humidity    = int(data['main']['humidity'] * 100);
+windSpeed   = int(data['wind']['speed'])
+windDir     = data['wind']['deg']
 windUnits   = "mph"
 
 # print(temperature)
-# print(humidity)   
-# print(windSpeed)  
-# print(windDir)    
-# print(windUnits)  
+# print(humidity)
+# print(windSpeed)
+# print(windDir)
+# print(windUnits)
 
 # Although the Python Imaging Library does have nice font support,
 # I opted here to use a raster bitmap for all of the glyphs instead.
@@ -137,7 +136,7 @@ winDirNum = 0  # Wind direction glyph number
 if windSpeed > 0:
     for winDirNum in range(len(DirAngle) - 1):
         if windDir < DirAngle[winDirNum]: break
-winDirNum+=1      
+winDirNum+=1
 w  = Humidity.size[0] + 5 + numWidth(s, HumiDigit)
 w2 = Wind.size[0] + 5 + numWidth(s2, HumiDigit)
 if windSpeed > 0:
