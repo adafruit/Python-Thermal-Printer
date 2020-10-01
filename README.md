@@ -1,4 +1,4 @@
-# Python-Thermal-Printer Module
+# Amazing Python-Thermal-Printer Module
 
 Python3 port of the original Adafruit [Python-Thermal-Printer](https://github.com/adafruit/Python-Thermal-Printer) library.
 
