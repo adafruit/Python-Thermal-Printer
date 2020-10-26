@@ -13,7 +13,7 @@ stty -F /dev/serial0 19200
 echo -e "This is a test.\\n\\n\\n" > /dev/serial0
 ```
 
-### Installing
+### Installing Process
 
 Update the system and install prequisities.
 
