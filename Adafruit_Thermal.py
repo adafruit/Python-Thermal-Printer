@@ -547,9 +547,8 @@ class Adafruit_Thermal(Serial):
 	# For any other behavior (scale, B&W threshold, etc.), use
 	# the Imaging Library to perform such operations before
 	# passing the result to this function.
-	def printImage(self, image_file, LaaT=False):
+	def printImage(self, image, LaaT=False):
 		from PIL import Image
-		image = Image.open(image_file)
 		if image.mode != '1':
 			image = image.convert('1')
 
