@@ -72,7 +72,8 @@ class Adafruit_Thermal(Serial):
 		# with the 'firmware=X' argument, where X is the major
 		# version number * 100 + the minor version number (e.g.
 		# pass "firmware=264" for version 2.64.
-		self.firmwareVersion = kwargs.get('firmware', 268)
+		self.firmwareVersion = kwargs.pop('firmware', 268)
+		heatTime = kwargs.pop('heattime', self.defaultHeatTime)
 
 		if self.writeToStdout is False:
 			# Calculate time to issue one byte to the printer.
@@ -109,7 +110,6 @@ class Adafruit_Thermal(Serial):
 			# may occur.  The more heating interval, the more
 			# clear, but the slower printing speed.
 
-			heatTime = kwargs.get('heattime', self.defaultHeatTime)
 			self.writeBytes(
 			  27,       # Esc
 			  55,       # 7 (print settings)
