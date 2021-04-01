@@ -19,7 +19,7 @@ Update the system and install prequisities.
 
 ```
 sudo apt-get update
-sudo apt-get install git cups wiringpi build-essential libcups2-dev libcupsimage2-dev python-serial python-pil python-unidecode
+sudo apt-get install git cups wiringpi build-essential libcups2-dev libcupsimage2-dev python3-serial python-pil python-unidecode
 ```
 
 Install the printer driver. Don't worry about the warnings that g++ gives.
