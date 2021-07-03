@@ -4,14 +4,14 @@
 import time
 from Adafruit_Thermal import *
 
-i_feed = 4
+i_feed = 3
 f_pause = 1.0
 
 printer = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 
 datestamp = time.strftime("%Y-%m-%d", time.gmtime())
 print ("Date in preferred format:", datestamp)
-timestamp = time.strftime("%H:%M:%S", time.gmtime())
+timestamp = 'T' + time.strftime("%H:%M:%S", time.gmtime()) + 'Z'
 print ("Time in preferred format:", timestamp)
 
 # Give a little room at the top
