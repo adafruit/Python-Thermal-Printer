@@ -50,7 +50,7 @@ class Adafruit_Thermal(Serial):
 	lineSpacing     =     8
 	barcodeHeight   =    50
 	printMode       =     0
-	defaultHeatTime =   180
+	defaultHeatTime =   120
 	firmwareVersion =   268
 	writeToStdout   = False
 
@@ -549,11 +549,8 @@ class Adafruit_Thermal(Serial):
 	# passing the result to this function.
 	def printImage(self, image_file, LaaT=False):
 		from PIL import Image
+		# image = Image.open(image_file)
 		image = image_file
-
-		if isinstance(image_file, str):
-			image = Image.open(image_file)
-
 		if image.mode != '1':
 			image = image.convert('1')
 

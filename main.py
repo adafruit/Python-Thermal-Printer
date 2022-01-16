@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # Main script for Adafruit Internet of Things Printer 2.  Monitors button
 # for taps and holds, performs periodic actions (Twitter polling by default)
@@ -19,6 +19,8 @@ import RPi.GPIO as GPIO
 import subprocess, time, socket
 from PIL import Image
 from Adafruit_Thermal import *
+from datetime import date
+import calendar
 
 ledPin       = 18
 buttonPin    = 23
@@ -33,7 +35,7 @@ printer      = Adafruit_Thermal("/dev/serial0", 19200, timeout=5)
 # Called when button is briefly tapped.  Invokes time/temperature script.
 def tap():
   GPIO.output(ledPin, GPIO.HIGH)  # LED on while working
-  subprocess.call(["python", "timetemp.py"])
+  subprocess.call(["python3", "forecast.py"])
   GPIO.output(ledPin, GPIO.LOW)
 
 
@@ -51,7 +53,7 @@ def hold():
 # Invokes twitter script.
 def interval():
   GPIO.output(ledPin, GPIO.HIGH)
-  p = subprocess.Popen(["python", "twitter.py", str(lastId)],
+  p = subprocess.Popen(["python3", "twitter.py", str(lastId)],
     stdout=subprocess.PIPE)
   GPIO.output(ledPin, GPIO.LOW)
   return p.communicate()[0] # Script pipes back lastId, returned to main
@@ -61,8 +63,11 @@ def interval():
 # Invokes weather forecast and sudoku-gfx scripts.
 def daily():
   GPIO.output(ledPin, GPIO.HIGH)
-  subprocess.call(["python", "forecast.py"])
-  subprocess.call(["python", "sudoku-gfx.py"])
+  subprocess.call(["python3", "forecast.py"])
+  d = date.today()
+  weekday = calendar.day_name[date(d.year,d.month,d.day).weekday()]
+  if weekday == "Saturday" or weekday == "Sunday":
+ 	 subprocess.call(["python3", "sudoku-gfx.py"])
   GPIO.output(ledPin, GPIO.LOW)
 
 
@@ -159,9 +164,9 @@ while(True):
   # Every 30 seconds, run Twitter scripts.  'lastId' is passed around
   # to preserve state between invocations.  Probably simpler to do an
   # import thing.
-  if t > nextInterval:
-    nextInterval = t + 30.0
-    result = interval()
-    if result is not None:
-      lastId = result.rstrip('\r\n')
+#  if t > nextInterval:
+#    nextInterval = t + 30.0
+#    result = interval()
+#    if result is not None:
+#      lastId = result.rstrip('\r\n')
 
