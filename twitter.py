@@ -27,7 +27,7 @@
 # with dummy strings.
 
 from __future__ import print_function
-import base64, HTMLParser, httplib, json, sys, urllib, zlib
+import base64, HTMLParser, httplib, json, sys, urllib, zlib, textwrap
 from unidecode import unidecode
 from Adafruit_Thermal import *
 
@@ -119,9 +119,11 @@ for tweet in data['statuses']:
 
   # Remove HTML escape sequences
   # and remap Unicode values to nearest ASCII equivalents
-  printer.print(unidecode(
-    HTMLParser.HTMLParser().unescape(tweet['text'])))
-
+  # Use textwrap module to wrap neatly at 32 characters
+  tweettext=textwrap.wrap(unidecode(
+    HTMLParser.HTMLParser().unescape(tweet['text'])),32)
+  for line in tweettext:
+    printer.print(line + "\n")
   printer.feed(3)
 
 print(maxId) # Piped back to calling process
