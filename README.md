@@ -1,5 +1,7 @@
-NOTE: not recommended for new designs. The CircuitPython Thermal Printer library is preferred going forward:
-https://github.com/adafruit/Adafruit_CircuitPython_Thermal_Printer
+> ---
+> **!!! NOTE !!!**
+> **THIS REPOSITORY IS ARCHIVED AND IS NO LONGER SUPPORTED OR MAINTAINED***
+> ---
 
 # Python-Thermal-Printer Module
 
