@@ -447,6 +447,7 @@ class Adafruit_Thermal(Serial):
 		else:
 			pos = 0
 		self.writeBytes(0x1B, 0x61, pos)
+		self.justification = c
 
 	# Feeds by the specified number of lines
 	def feed(self, x=1):
@@ -502,7 +503,7 @@ class Adafruit_Thermal(Serial):
 	def underlineOff(self):
 		self.writeBytes(27, 45, 0)
 
-	def printBitmap(self, w, h, bitmap, LaaT=False):
+	def printBitmap(self, w, h, bitmap, LaaT=False, justify=False):
 		rowBytes = math.floor((w + 7) / 8)  # Round up to next byte boundary
 		if rowBytes >= 48:
 			rowBytesClipped = 48  # 384 pixels max width
@@ -518,6 +519,15 @@ class Adafruit_Thermal(Serial):
 		if LaaT: maxChunkHeight = 1
 		else:    maxChunkHeight = 255
 
+		# if justify is True, respect the text justification
+		# setting by prefixing each row with empty bytes
+		padBytes = 0
+		if justify:
+			rowBytesRemaining = 48 - rowBytesClipped
+			if   self.justification == 'R': padBytes = rowBytesRemaining
+			elif self.justification == 'C': padBytes = rowBytesRemaining // 2
+		padding = bytes([0x00] * padBytes)
+
 		i = 0
 		for rowStart in range(0, h, maxChunkHeight):
 			chunkHeight = h - rowStart
@@ -525,9 +535,13 @@ class Adafruit_Thermal(Serial):
 				chunkHeight = maxChunkHeight
 
 			# Timeout wait happens here
-			self.writeBytes(18, 42, chunkHeight, rowBytesClipped)
+			self.writeBytes(18, 42, chunkHeight, rowBytesClipped + padBytes)
 
 			for y in range(chunkHeight):
+				if padding:
+					if self.writeToStdout: sys.stdout.write(padding)
+					else: super(Adafruit_Thermal, self).write(padding)
+					
 				for x in range(rowBytesClipped):
 					if self.writeToStdout:
 						sys.stdout.write(bytes([bitmap[i]]))
@@ -547,7 +561,7 @@ class Adafruit_Thermal(Serial):
 	# For any other behavior (scale, B&W threshold, etc.), use
 	# the Imaging Library to perform such operations before
 	# passing the result to this function.
-	def printImage(self, image_file, LaaT=False):
+	def printImage(self, image_file, LaaT=False, justify=False):
 		from PIL import Image
 		# image = Image.open(image_file)
 		image = image_file
@@ -576,7 +590,7 @@ class Adafruit_Thermal(Serial):
 					bit >>= 1
 				bitmap[n + b] = sum
 
-		self.printBitmap(width, height, bitmap, LaaT)
+		self.printBitmap(width, height, bitmap, LaaT, justify)
 
 	# Take the printer offline. Print commands sent after this
 	# will be ignored until 'online' is called.
